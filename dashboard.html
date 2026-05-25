@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soap Finder - 固形石鹸50選 ダッシュボード</title>
+  <!-- Google Fonts: Outfit & Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* CSS Variables for Premium Earthy/Aroma Palette */
+    :root {
+      --bg-color: #f7f6f2;
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --text-color: #2c3531;
+      --text-muted: #626d69;
+      --accent-color: #8fa89b;
+      --accent-hover: #718d7f;
+      --primary-gradient: linear-gradient(135deg, #d8e2dc 0%, #ffe5d9 100%);
+      --border-color: rgba(143, 168, 155, 0.2);
+      --shadow-soft: 0 8px 32px 0 rgba(143, 168, 155, 0.1);
+      --border-radius: 16px;
+      --font-base: 'Noto Sans JP', sans-serif;
+      --font-accent: 'Outfit', sans-serif;
+      --gold-color: #d4af37;
+      --green-color: #4caf50;
+    }
+
+    /* Dark Mode (Dynamic Preference) */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #121614;
+        --card-bg: rgba(30, 36, 33, 0.85);
+        --text-color: #e8ece9;
+        --text-muted: #a3b0aa;
+        --accent-color: #a3c4bc;
+        --accent-hover: #c4d7d2;
+        --primary-gradient: linear-gradient(135deg, #1a221e 0%, #2a1b15 100%);
+        --border-color: rgba(163, 196, 188, 0.15);
+        --shadow-soft: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        --gold-color: #ffd700;
+        --green-color: #81c784;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: var(--font-base);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Header Styling */
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 3rem 2rem;
+      border-radius: var(--border-radius);
+      background: var(--primary-gradient);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    header h1 {
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 2.8rem;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, var(--text-color), var(--accent-hover));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    /* Interactive Search & Filters Section */
+    .filter-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      align-items: end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .filter-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .filter-control {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text-color);
+      font-family: var(--font-base);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .filter-control:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(143, 168, 155, 0.2);
+    }
+
+    /* Range Slider Styling */
+    .price-range-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .price-range-val {
+      font-family: var(--font-accent);
+      font-weight: 600;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* Tabs UI */
+    .tabs-container {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-base);
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0.5rem 1.5rem;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-color);
+      background: rgba(143, 168, 155, 0.1);
+    }
+
+    .tab-btn.active {
+      color: #fff;
+      background: var(--accent-color);
+      box-shadow: 0 4px 12px rgba(143, 168, 155, 0.25);
+    }
+
+    .tab-btn span {
+      font-family: var(--font-accent);
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.1rem 0.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    /* Grid Layout */
+    .soap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    /* Soap Card Glassmorphism & Animations */
+    .soap-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease, opacity 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .soap-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px 0 rgba(143, 168, 155, 0.2);
+      border-color: var(--accent-color);
+    }
+
+    /* User Interaction Controls on Card */
+    .card-actions {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 10;
+    }
+
+    .action-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .action-btn {
+        background: rgba(30, 36, 33, 0.9);
+      }
+    }
+
+    .action-btn:hover {
+      transform: scale(1.15);
+    }
+
+    /* Favorite Active */
+    .action-btn.fav-btn.active {
+      color: var(--gold-color);
+      border-color: var(--gold-color);
+      background: rgba(255, 215, 0, 0.1);
+    }
+
+    /* Purchased Active */
+    .action-btn.buy-btn.active {
+      color: var(--green-color);
+      border-color: var(--green-color);
+      background: rgba(76, 175, 80, 0.1);
+    }
+
+    .card-header {
+      margin-bottom: 1.25rem;
+      padding-right: 4.5rem; /* Space for absolute actions */
+    }
+
+    .brand-tag {
+      font-family: var(--font-accent);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-color);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    .soap-name {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .meta-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      background: rgba(143, 168, 155, 0.15);
+      color: var(--text-color);
+      font-weight: 500;
+      border: 1px solid rgba(143, 168, 155, 0.2);
+    }
+
+    .badge.price {
+      background: rgba(255, 229, 217, 0.3);
+      border-color: rgba(255, 229, 217, 0.6);
+      font-family: var(--font-accent);
+      font-weight: 600;
+    }
+
+    .soap-features {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+
+    .soap-reviews {
+      font-size: 0.85rem;
+      background: rgba(0, 0, 0, 0.02);
+      border-left: 3px solid var(--accent-color);
+      padding: 0.5rem 0.75rem;
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 1.25rem;
+      color: var(--text-color);
+      font-style: italic;
+    }
+
+    /* Purchase Details Form in Card */
+    .purchase-form {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      background: rgba(143, 168, 155, 0.08);
+      border: 1px dashed var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .form-group label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-input {
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.9);
+      color: var(--text-color);
+      outline: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .form-input {
+        background: rgba(30, 36, 33, 0.8);
+      }
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-color);
+    }
+
+    .form-input.textarea {
+      resize: vertical;
+      min-height: 40px;
+      font-family: var(--font-base);
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .feel-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    
+    .feel-val {
+      font-weight: 600;
+      color: var(--accent-hover);
+      font-size: 0.85rem;
+    }
+
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      background: var(--accent-color);
+      color: #fff;
+      font-weight: 500;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      gap: 0.25rem;
+    }
+
+    .btn-link:hover {
+      background: var(--accent-hover);
+      transform: scale(1.05);
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Fade-in Animation Classes */
+    .hidden {
+      display: none !important;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      header {
+        padding: 2rem 1rem;
+      }
+      header h1 {
+        font-size: 2rem;
+      }
+      .filter-panel {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+      }
+      .tabs-container {
+        flex-wrap: wrap;
+      }
+    }
+
+    /* Cloud Sync Panel Styling */
+    .sync-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-soft);
+    }
+    
+    .sync-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      list-style: none; /* Hide default triangle */
+    }
+    
+    .sync-header::-webkit-details-marker {
+      display: none; /* Hide default triangle for safari */
+    }
+    
+    .sync-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-color);
+    }
+
+    .sync-status-badge {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .status-unconfigured {
+      background: rgba(98, 109, 105, 0.15);
+      color: var(--text-muted);
+    }
+
+    .status-syncing {
+      background: rgba(143, 168, 155, 0.2);
+      color: var(--accent-hover);
+      animation: pulse-sync 1.5s infinite ease-in-out;
+    }
+
+    .status-success {
+      background: rgba(76, 175, 80, 0.15);
+      color: var(--green-color);
+    }
+
+    .status-pending {
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--gold-color);
+    }
+
+    .status-error {
+      background: rgba(211, 47, 47, 0.1);
+      color: #d32f2f;
+    }
+
+    @keyframes pulse-sync {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    .sync-body {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .sync-input-group {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .sync-input {
+      flex-grow: 1;
+      min-width: 280px;
+    }
+
+    .sync-btn {
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-family: var(--font-base);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .sync-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .sync-btn:disabled {
+      background: var(--text-muted) !important;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .instructions {
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      line-height: 1.6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .instructions {
+        background: rgba(255, 255, 255, 0.02);
+      }
+    }
+
+    .instructions strong {
+      color: var(--text-color);
+    }
+
+    .instructions ol {
+      margin-left: 1.25rem;
+      margin-top: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .instructions ul {
+      margin-left: 1.25rem;
+      margin-top: 0.25rem;
+      list-style-type: circle;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Soap Finder</h1>
+      <p>肌に優しく香りが良い固形石鹸（ボディ用）50選比較ダッシュボード</p>
+    </header>
+
+    <!-- Cloud Sync Section -->
+    <details class="sync-panel" id="sync-panel">
+      <summary class="sync-header">
+        <h3>☁️ スプレッドシート同期設定</h3>
+        <span id="sync-status" class="sync-status-badge status-unconfigured">
+          📴 同期未設定（ローカル保存）
+        </span>
+      </summary>
+      <div class="sync-body">
+        <div class="sync-input-group" style="margin-bottom: 0.5rem;">
+          <input type="password" id="gas-url" class="filter-control sync-input" placeholder="Google Apps Script ウェブアプリのURLを入力...">
+          <button id="toggle-url-visibility" class="sync-btn" style="background: transparent; color: var(--text-color); border: 1px solid var(--border-color); padding: 0.75rem 1rem;">表示</button>
+        </div>
+        <div class="sync-input-group">
+          <input type="password" id="sync-password" class="filter-control sync-input" placeholder="同期用パスワード（合言葉）を入力...">
+          <button id="toggle-password-visibility" class="sync-btn" style="background: transparent; color: var(--text-color); border: 1px solid var(--border-color); padding: 0.75rem 1rem;">表示</button>
+          <button id="save-sync-btn" class="sync-btn" onclick="saveGasConfig()">設定を保存して同期</button>
+          <button id="force-sync-btn" class="sync-btn" style="background: transparent; color: var(--accent-hover); border: 1px solid var(--accent-color);" onclick="triggerManualSync()" disabled>今すぐ同期</button>
+        </div>
+        
+        <div class="instructions">
+          <strong>💡 Googleスプレッドシートと同期する手順 (データ消失防止)</strong>
+          <ol>
+            <li>Googleスプレッドシートを新規作成し、シート名を「シート1」のままにします。</li>
+            <li>メニューの「拡張機能」 ＞ 「Apps Script」を開きます。</li>
+            <li>エディタ内のコードをすべて削除し、プロジェクトの <code>README.md</code> に記載されているGASコードを貼り付けます。</li>
+            <li>エディタ右上の「デプロイ」 ＞ 「新しいデプロイ」をクリックします。</li>
+            <li>種類の選択（歯車アイコン）で「ウェブアプリ」を選択し、以下のように設定してデプロイします：
+              <ul>
+                <li>次のユーザーとして実行: <b>自分</b></li>
+                <li>アクセスできるユーザー: <b>全員</b> (※ブラウザからの通信に必要です)</li>
+              </ul>
+            </li>
+            <li>承認画面が表示されたら許可し、最後に発行された「ウェブアプリのURL」をコピーして上の入力欄に貼り付け、「設定を保存して同期」を押します。</li>
+          </ol>
+        </div>
+      </div>
+    </details>
+
+    <!-- Filters -->
+    <div class="filter-panel">
+      <div class="filter-group">
+        <label for="search">キーワード検索</label>
+        <input type="text" id="search" class="filter-control" placeholder="石鹸名、ブランド、香りなど...">
+      </div>
+
+      <div class="filter-group">
+        <label for="price-range">価格上限 (税込)</label>
+        <div class="price-range-wrapper">
+          <input type="range" id="price-range" class="filter-control" min="400" max="3000" step="50" value="3000">
+          <span class="price-range-val" id="price-val">¥3,000</span>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label for="process-filter">製法</label>
+        <select id="process-filter" class="filter-control">
+          <option value="all">すべて</option>
+          <option value="コールドプロセス">コールドプロセス</option>
+          <option value="枠練り">枠練り</option>
+          <option value="機械練り">機械練り</option>
+          <option value="半熟">半熟釜焚き</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="scent-filter">香りの系統</label>
+        <select id="scent-filter" class="filter-control">
+          <option value="all">すべて</option>
+          <option value="シトラス">シトラス・柑橘</option>
+          <option value="フローラル">フローラル・甘め</option>
+          <option value="ウッディ">ウッディ・和風・アース</option>
+          <option value="ハーブ">ハーブ・ミント・クリア</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sort-select">並び替え</label>
+        <select id="sort-select" class="filter-control">
+          <option value="default">登録順 (ID順)</option>
+          <option value="price-asc">価格の安い順</option>
+          <option value="price-desc">価格の高い順</option>
+          <option value="date-desc">購入日が新しい順</option>
+          <option value="date-asc">購入日が古い順</option>
+          <option value="cost-asc">コスパが良い順 (1日あたり安価)</option>
+          <option value="cost-desc">コスパが悪い順 (1日あたり高価)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tabs UI -->
+    <div class="tabs-container">
+      <button class="tab-btn active" data-tab="all">すべての石鹸 (<span id="total-badge">50</span>)</button>
+      <button class="tab-btn" data-tab="favorites">★ お気に入り (<span id="fav-badge">0</span>)</button>
+      <button class="tab-btn" data-tab="purchased">✓ 買った記録 (<span id="pur-badge">0</span>)</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div id="results-count">50件の石鹸が見つかりました</div>
+    </div>
+
+    <!-- Soap Grid -->
+    <div class="soap-grid" id="soap-grid">
+      <!-- Generated via JS -->
+    </div>
+  </div>
+
+  <script>
+    // Embedded JSON data
+    const soaps = [
+      {
+        "id": 1,
+        "name": "神戸酒石鹸",
+        "brand": "無添加石鹸本舗",
+        "price": 1430,
+        "process": "コールドプロセス",
+        "scent_type": "ウッディ・和風",
+        "scent_desc": "ひのきの天然精油と日本酒のほのかな甘い香り",
+        "features": "兵庫県産の日本酒「福寿」とコメヌカ油を配合。天然のグリセリンやアミノ酸が豊富で、肌のバリア機能を高めます。防腐剤や合成着色料は一切無添加。",
+        "reviews": "「洗い上がりがまるで美容液を塗ったようにしっとりする」「ひのきの香りが浴室に広がり温泉気分」「乾燥肌でも突っ張らない」と高評価。",
+        "skin_feel": "しっとり・もちもち"
+      },
+      {
+        "id": 2,
+        "name": "神戸米ぬか石鹸",
+        "brand": "無添加石鹸本舗",
+        "price": 1430,
+        "process": "コールドプロセス",
+        "scent_type": "無香料・素朴",
+        "scent_desc": "原料由来のほのかな米ぬかの香り（無香料）",
+        "features": "地元兵庫県産の米ぬかとコメヌカ油をベースにした低刺激石鹸。米ぬかに含まれるビタミンEやオリザノールが肌を健やかに保ちます。",
+        "reviews": "「子供の乾燥肌にも安心して使える」「香料が苦手な人に最適」「洗い上がりのすべすべ感がくせになる」とのレビューが多い。",
+        "skin_feel": "すべすべ・しっとり"
+      },
+      {
+        "id": 3,
+        "name": "神戸はちみつ石鹸",
+        "brand": "無添加石鹸本舗",
+        "price": 1430,
+        "process": "コールドプロセス",
+        "scent_type": "柑橘・ハーブ",
+        "scent_desc": "爽やかなレモングラス精油の香り",
+        "features": "国産ハチミツを贅沢に配合。ハチミツの天然の吸湿性と殺菌作用により、肌に潤いを与えながら清潔に保ちます。",
+        "reviews": "「ハチミツの高い保湿力を感じる」「レモングラスの香りがすっきりしていて夏でも冬でも使いやすい」「泡が濃密でへたらない」と好評。",
+        "skin_feel": "しっとり・もっちり"
+      },
+      {
+        "id": 4,
+        "name": "疲れたお肌石鹸",
+        "brand": "無添加石鹸本舗",
+        "price": 1430,
+        "process": "コールドプロセス",
+        "scent_type": "シトラス・ミント",
+        "scent_desc": "オレンジ、ペパーミント、ティーツリー、パチョリ精油のブレンド",
+        "features": "マカデミアナッツ油やアボカド油などの高級オイルをベースに、肌を元気にする精油をブレンド。紫外線や乾燥で疲れた肌を労ります。",
+        "reviews": "「爽快感があるのに乾燥しない絶妙な洗い上がり」「ハーブとシトラスの香りで一日の疲れが吹き飛ぶ」「夏のボディソープとして最高」との声。",
+        "skin_feel": "みずみずしい・しっとり"
+      },
+      {
+        "id": 5,
+        "name": "天然ラベンダー石鹸",
+        "brand": "無添加石鹸本舗",
+        "price": 1430,
+        "process": "コールドプロセス",
+        "scent_type": "フローラル・ハーブ",
+        "scent_desc": "真正ラベンダー精油の心地よい香り",
+        "features": "純粋なラベンダーエッセンシャルオイルのみで香り付け。シアバターやオリーブオイルによる豊かな潤いとリラックス効果を提供します。",
+        "reviews": "「人工的でない本物のラベンダーの香りに癒やされる」「寝る前の入浴時にボディソープとして使うとぐっすり眠れる」「肌荒れが落ち着いた」と高評価。",
+        "skin_feel": "しっとり・なめらか"
+      },
+      {
+        "id": 6,
+        "name": "ヨモギソープ（艾草）",
+        "brand": "阿原 YUAN（ユアン）",
+        "price": 2310,
+        "process": "コールドプロセス",
+        "scent_type": "ハーブ・薬草・漢方",
+        "scent_desc": "ティーツリーやパチョリをブレンドした力強い薬草の香り",
+        "features": "台湾の農園で栽培された野生ヨモギを使用。肌荒れやニキビを防ぎ、背中ニキビなどのトラブルを抱える肌を清潔で健やかに整えます。",
+        "reviews": "「漢方のような香りで効いている感じがする」「背中ニキビができにくくなった」「すっきりするのにつっぱらない」と根強い人気。",
+        "skin_feel": "さっぱり・すべすべ"
+      },
+      {
+        "id": 7,
+        "name": "月桃ソープ（月桃）",
+        "brand": "阿原 YUAN（ユアン）",
+        "price": 2530,
+        "process": "コールドプロセス",
+        "scent_type": "フローラル・オリエンタル",
+        "scent_desc": "月桃やゼラニウムをブレンドした華やかで甘くスパイシーな香り",
+        "features": "6年以上かけて育った月桃を贅沢に使用。ポリフェノールが豊富で、乾燥肌や年齢肌に高い潤いとハリ, ツヤを与えます。ブランド一番人気。",
+        "reviews": "「ユアンの中で一番しっとりする」「月桃の独特な甘い香りに癒やされる」「肌のキメが整ってワントーン明るくなった気がする」との口コミ。",
+        "skin_feel": "超しっとり・うるおい"
+      },
+      {
+        "id": 8,
+        "name": "レモンソープ（檸檬）",
+        "brand": "阿原 YUAN（ユアン）",
+        "price": 2310,
+        "process": "コールドプロセス",
+        "scent_type": "シトラス・柑橘",
+        "scent_desc": "もぎたてレモンのような爽やかでクリアな香り",
+        "features": "レモンやライムの精油、緑茶エキスを配合。余分な皮脂や汚れをすっきりと洗い流し、お肌をキュッと引き締めます。",
+        "reviews": "「夏の朝のシャワーにぴったり」「皮脂汚れがしっかり落ちてすべすべになる」「レモングラス風の爽快な香りが大好き」と人気。",
+        "skin_feel": "さっぱり・キュッと締まる"
+      },
+      {
+        "id": 9,
+        "name": "パチョリソープ（百草）",
+        "brand": "阿原 YUAN（ユアン）",
+        "price": 2310,
+        "process": "コールドプロセス",
+        "scent_type": "ウッディ・アース",
+        "scent_desc": "土や森林を思わせる深く落ち着いたパチョリの香り",
+        "features": "パチョリやベチバーなどの深みのあるハーブを配合。敏感に傾きがちな肌を優しく保護し、肌荒れを防いでしっとりと洗い上げます。",
+        "reviews": "「独特の墨のようなウッディな香りが男性にも人気」「乾燥によるかゆみが治まった」「お風呂上がりのカサカサが軽減された」との評価。",
+        "skin_feel": "しっとり・落ち着く"
+      },
+      {
+        "id": 10,
+        "name": "ハトムギソープ（薏仁）",
+        "brand": "阿原 YUAN（ユアン）",
+        "price": 2310,
+        "process": "コールドプロセス",
+        "scent_type": "ハーブ・無香料",
+        "scent_desc": "原料由来の非常に穏やかなハーブの香り",
+        "features": "ハトムギやリョクトウのエキスを配合。角質を優しくケアし、くすみのないクリアでなめらかな肌へと導く美肌ソープです。",
+        "reviews": "「スクラブ感はないが、肌がツルツルになる」「肌のざらつきが取れてなめらかになった」「香りが優しくて使いやすい」と好評。",
+        "skin_feel": "なめらか・すべすべ"
+      },
+      {
+        "id": 11,
+        "name": "リラックスソープ (No.2)",
+        "brand": "LE BAIGNEUR",
+        "price": 2200,
+        "process": "コールドプロセス",
+        "scent_type": "シトラス・フローラル",
+        "scent_desc": "プチグレン（ビターオレンジ葉）とラベンダーの落ち着いた香り",
+        "features": "フランス発、100%天然由来・オーガニック素材を使用。シアバターとココアバターをベースに、乾燥肌をいたわりながら穏やかに洗い上げます。",
+        "reviews": "「パッケージがおしゃれでプレゼントに最高」「ラベンダーとアロマのブレンドが非常に上品」「お風呂上がりの肌が柔らかくなる」と評判。",
+        "skin_feel": "しっとり・柔らか"
+      },
+      {
+        "id": 12,
+        "name": "トニックソープ (No.1)",
+        "brand": "LE BAIGNEUR",
+        "price": 2200,
+        "process": "コールドプロセス",
+        "scent_type": "スパイシー・シトラス",
+        "scent_desc": "ブラックペッパー、クローブ、シトラスのウッディで刺激的な香り",
+        "features": "敏感肌や活力を失った肌向け。ヘンプシードオイル（アサ種子油）配合で、肌のコンディションを整え、ハリと引き締め感を与えます。",
+        "reviews": "「他にはないスパイシーでウッディな香りが最高」「洗い上がりがシャキッとする」「男性へのギフトとしてとても喜ばれた」とのレビュー。",
+        "skin_feel": "さっぱり・引き締まり"
+      },
+      {
+        "id": 13,
+        "name": "ゴマージュソープ (No.3)",
+        "brand": "LE BAIGNEUR",
+        "price": 2200,
+        "process": "コールドプロセス",
+        "scent_type": "ハーブ・ミント",
+        "scent_desc": "ペパーミントとプチグレンの爽快なハーブの香り",
+        "features": "ホワイトクレイ（アルジル）とココナッツ繊維を配合した軽いスクラブソープ。古い角質や余分な皮脂を取り除き、肌を滑らかにします。",
+        "reviews": "「スクラブが優しく、毎日使っても痛くない」「ミントのすっきりした香りで夏場に最適」「洗い上がりのツルツル感に満足」との声。",
+        "skin_feel": "ツルツル・さっぱり"
+      },
+      {
+        "id": 14,
+        "name": "マザーソープ ラベンダー",
+        "brand": "LEAF & BOTANICS",
+        "price": 440,
+        "process": "枠練り",
+        "scent_type": "フローラル・ハーブ",
+        "scent_desc": "ラベンダーエッセンシャルオイルのクリアな香り",
+        "features": "石けん素地を釜焚き製法で作り、ラベンダー精油を配合して枠練りでじっくり仕上げた石鹸。肌への負担が少なくマイルド。リーズナブルながら高品質。",
+        "reviews": "「この安さで本物の精油の香りが楽しめるのはすごい」「泡立ちが豊かで、体を洗うのにぴったり」「敏感肌でも全く刺激がない」と大絶賛。",
+        "skin_feel": "マイルド・すべすべ"
+      },
+      {
+        "id": 15,
+        "name": "マザーソープ グレープフルーツ",
+        "brand": "LEAF & BOTANICS",
+        "price": 440,
+        "process": "枠練り",
+        "scent_type": "シトラス・柑橘",
+        "scent_desc": "グレープフルーツエッセンシャルオイルのジューシーな香り",
+        "features": "グレープフルーツ精油を配合し、さっぱりとした使用感が特徴。皮脂汚れをすっきり落としつつ、必要な潤いは守ります。",
+        "reviews": "「ジューシーなフレッシュな香りでリフレッシュできる」「泡切れが良くぬるつかない」「コスパが良すぎて何度もリピートしている」との評判。",
+        "skin_feel": "さっぱり・爽快"
+      },
+      {
+        "id": 16,
+        "name": "マザーソープ レモングラス",
+        "brand": "LEAF & BOTANICS",
+        "price": 440,
+        "process": "枠練り",
+        "scent_type": "シトラス・ハーブ",
+        "scent_desc": "レモングラスエッセンシャルオイルのハーブ調の香り",
+        "features": "すっきりとしたレモングラス精油の香りが際立つ石鹸。キメ細かい泡立ちで、全身を爽やかに洗い上げます。",
+        "reviews": "「アジアのスパを思わせるレモングラスの香りが最高」「汗をかいた後のシャワーで使うと非常にさっぱりする」「泡立ちネットでモコモコになる」と評価。",
+        "skin_feel": "さっぱり・滑らか"
+      },
+      {
+        "id": 17,
+        "name": "マザーソープ ローズマリー",
+        "brand": "LEAF & BOTANICS",
+        "price": 440,
+        "process": "枠練り",
+        "scent_type": "ハーブ・クリア",
+        "scent_desc": "ローズマリーエッセンシャルオイルのキリッとした香り",
+        "features": "ローズマリー精油のすっきりとした香りで、気分を引き締めます。古い角質や汚れを落とし、ツルツルした肌へ。",
+        "reviews": "「頭がすっきりするようなハーブの香り」「朝のシャワーでの使用がお勧め」「お肌がキュッと引き締まる感覚がある」との声。",
+        "skin_feel": "ツルツル・さっぱり"
+      },
+      {
+        "id": 18,
+        "name": "マザーソープ ユーカリ",
+        "brand": "LEAF & BOTANICS",
+        "price": 440,
+        "process": "枠練り",
+        "scent_type": "ハーブ・リフレッシュ",
+        "scent_desc": "ユーカリエッセンシャルオイルの清涼感のある香り",
+        "features": "ユーカリ精油のさっぱりした香りが広がる石鹸。ニキビができやすいボディの洗浄にも適しており、肌を清浄に保ちます。",
+        "reviews": "「スーッとする香りで鼻が通る感じが心地よい」「ニキビが気になる背中のケアに良い」「さっぱり感が強く、夏場に大活躍する」とのレビュー。",
+        "skin_feel": "さっぱり・爽快"
+      },
+      {
+        "id": 19,
+        "name": "ボタニカルソープ ラベンダー/ゼラニウム",
+        "brand": "MARKS&WEB",
+        "price": 600,
+        "process": "枠練り",
+        "scent_type": "フローラル・甘め",
+        "scent_desc": "ラベンダーとゼラニウムの甘く穏やかな香り",
+        "features": "ココナッツオイルやパームオイルをベースに、天然精油を贅沢にブレンド。枠練り製法でじっくりと乾燥・熟成させ、泡立ち良く仕上げました。",
+        "reviews": "「マークスアンドウェブの中で最も好きな香り」「女性らしい優雅な香りでバスタイムが贅沢になる」「手頃な価格でギフトにも重宝する」と高評価。",
+        "skin_feel": "しっとり・なめらか"
+      },
+      {
+        "id": 20,
+        "name": "ボタニカルソープ レモングラス/ガーデニア",
+        "brand": "MARKS&WEB",
+        "price": 600,
+        "process": "枠練り",
+        "scent_type": "シトラス・フローラル",
+        "scent_desc": "レモングラスの爽やかさとガーデニア（クチナシ）の甘い香り",
+        "features": "柑橘系のすっきり感と、クチナシのフローラルな甘さが絶妙にマッチ。泡立ちが豊かで、洗い上がりも突っ張りません。",
+        "reviews": "「甘すぎず爽やかで夏にぴったりの上品な香り」「浴室がとても良い香りになる」「肌がつるつるになり、使用感が非常に良い」との声。",
+        "skin_feel": "すべすべ・さっぱり"
+      },
+      {
+        "id": 21,
+        "name": "ボタニカルソープ ローズマリー/炭",
+        "brand": "MARKS&WEB",
+        "price": 600,
+        "process": "枠練り",
+        "scent_type": "ハーブ・ウッディ",
+        "scent_desc": "ローズマリーの爽やかでクリアなハーブの香り",
+        "features": "吸着成分の炭を配合。毛穴の奥の皮脂汚れや古い角質をすっきりと落とします。ローズマリー精油でさっぱりとした使い心地。",
+        "reviews": "「炭のおかげで毛穴がすっきりする感覚がある」「ローズマリーのキリッとした香りで男性も使いやすい」「さっぱりするがカサつかない」と人気。",
+        "skin_feel": "すっきり・すべすべ"
+      },
+      {
+        "id": 22,
+        "name": "ボタニカルソープ カミツレ/ホホバ",
+        "brand": "MARKS&WEB",
+        "price": 600,
+        "process": "枠練り",
+        "scent_type": "ハーブ・マイルド",
+        "scent_desc": "カミツレ（カモミール）の非常に優しい甘い香り",
+        "features": "保湿性に優れたホホバオイルと、肌荒れを防ぐカミツレエキスを配合. 乾燥肌やデリケートな肌を保護しながら優しく洗い上げます。",
+        "reviews": "「カモミールの優しい香りに癒やされる」「乾燥する冬場にはこれが一番しっとりして良い」「敏感肌でもかゆくならない」と評判。",
+        "skin_feel": "しっとり・マイルド"
+      },
+      {
+        "id": 23,
+        "name": "ボタニカルソープ ユズ/ビワ葉",
+        "brand": "MARKS&WEB",
+        "price": 600,
+        "process": "枠練り",
+        "scent_type": "シトラス・和風",
+        "scent_desc": "和のユズ精油のジューシーで爽やかな香り",
+        "features": "ユズ精油の香りが立つ人気の季節・定番石鹸。肌のキメを整えるビワ葉エキスを配合し、肌の潤いを守りながら優しく洗い上げます。",
+        "reviews": "「本物の柚子を切った時のようなフレッシュな香り」「冬のバスタイムに使うと非常に温まる気分になる」「しっとり感が持続する」との声。",
+        "skin_feel": "しっとり・すべすべ"
+      },
+      {
+        "id": 24,
+        "name": "マジックソープバー ラベンダー",
+        "brand": "Dr. Bronner's",
+        "price": 1210,
+        "process": "機械練り",
+        "scent_type": "フローラル·ハーブ",
+        "scent_desc": "オーガニックラベンダー精油の豊かな香り",
+        "features": "オリーブ油やヤシ油をベースに、ヘンプ油やホホバ油をブレンドした100%オーガニック・無添加石鹸。泡立ちが極めて良く、メイク落としやボディに多用途に使えます。",
+        "reviews": "「ボディも顔もこれ一つで洗えるので楽」「ラベンダーの香りが強く、お風呂中が良い香りになる」「長持ちするのでコスパが良い」と世界的な人気。",
+        "skin_feel": "さっぱり·つるつる"
+      },
+      {
+        "id": 25,
+        "name": "マジックソープバー シトラスオレンジ",
+        "brand": "Dr. Bronner's",
+        "price": 1210,
+        "process": "機械練り",
+        "scent_type": "シトラス·柑橘",
+        "scent_desc": "オレンジやレモンの甘く弾けるような香り",
+        "features": "天然シトラス精油を配合。気分をリフレッシュさせ、肌のくすみや汚れをすっきりと落とします。オーガニック原材料率95%以上。",
+        "reviews": "「子供が大好きなオレンジの香り」「洗い上がりがとてもさっぱりしていて気持ちいい」「泡立ちネットを使うとモコモコの泡ができる」とのレビュー。",
+        "skin_feel": "さっぱり·爽快"
+      },
+      {
+        "id": 26,
+        "name": "マジックソープバー ティーツリー",
+        "brand": "Dr. Bronner's",
+        "price": 1210,
+        "process": "機械練り",
+        "scent_type": "ハーブ·クリア",
+        "scent_desc": "ティーツリーの清涼感あふれるシャープな香り",
+        "features": "ティーツリー精油の優れた抗菌作用を活かした石鹸。ニキビやベタつきが気になるデリケートな肌を清潔に洗い上げ、肌荒れを防ぎます。",
+        "reviews": "「背中ニキビ対策として使い始めて効果を実感」「ティーツリーのすっきりした香りが夏場に最適」「洗い上がりの清潔感が素晴らしい」との評価。",
+        "skin_feel": "すっきり·さっぱり"
+      },
+      {
+        "id": 27,
+        "name": "マジックソープバー サンダルウッド＆ジャスミン",
+        "brand": "Dr. Bronner's",
+        "price": 1210,
+        "process": "機械練り",
+        "scent_type": "ウッディ・甘め",
+        "scent_desc": "白檀（サンダルウッド）の深みとジャスミンの甘いオリエンタルな香り",
+        "features": "サンダルウッドとジャスミンのエキゾチックな精油ブレンド。リラックス効果が高く、少し大人っぽいリッチなバスタイムを演出します。",
+        "reviews": "「エキゾチックで甘く落ち着いた高級感のある香り」「他の香りよりもしっとり感がある気がする」「ユニセックスで使える良い香り」と好評。",
+        "skin_feel": "マイルド·しっとり"
+      },
+      {
+        "id": 28,
+        "name": "マジックソープバー ペパーミント",
+        "brand": "Dr. Bronner's",
+        "price": 1210,
+        "process": "機械練り",
+        "scent_type": "ハーブ·ミント",
+        "scent_desc": "ペパーミント精油の超クールな香り",
+        "features": "天然オーガニックペパーミントオイルを高配合。爽快な清涼感が特徴で、夏場のバスタイムやスポーツ後のシャワーに最適です。",
+        "reviews": "「とにかく涼しい、風呂上がりに扇風機にあたると最高」「清涼感が強いが肌は荒れない」「夏の定番ボディソープ」との口コミ。",
+        "skin_feel": "ひんやり·さっぱり"
+      },
+      {
+        "id": 29,
+        "name": "みつばちマーチ (Honey I Washed The Kids)",
+        "brand": "LUSH",
+        "price": 980,
+        "process": "機械練り",
+        "scent_type": "フローラル・甘め",
+        "scent_desc": "ハチミツとキャラメル、シトラスの甘く香ばしい香り",
+        "features": "ハチミツとアロエベラが肌に高い潤いを与え、しっとり柔らかに洗い上げるラッシュの世界的ベストセラー石鹸。お肌の乾燥を防ぎます。",
+        "reviews": "「お風呂上がりに自分の体から甘いキャラメルのような香りがして幸せ」「乾燥肌でも全くつっぱらず、しっとりする」「香りの持続力がすごい」と絶賛。",
+        "skin_feel": "超しっとり・もちもち"
+      },
+      {
+        "id": 30,
+        "name": "アウトバックメイト (Outback Mate)",
+        "brand": "LUSH",
+        "price": 980,
+        "process": "機械練り",
+        "scent_type": "ハーブ·ミント",
+        "scent_desc": "ユーカリ、ペパーミント、レモングラスの爽快な香り",
+        "features": "青い海をイメージした美しい青色の石鹸。ユーカリの抗菌・清浄作用とペパーミントの爽快感で、肌をすっきりと洗い上げます。",
+        "reviews": "「ユーカリとミントのハーブ香が非常にリフレッシュできる」「見た目も爽やかで夏にぴったり」「男性へのプレゼントにも選ばれる」と人気。",
+        "skin_feel": "さっぱり・爽快"
+      },
+      {
+        "id": 31,
+        "name": "スリーピーソープ (Sleepy)",
+        "brand": "LUSH",
+        "price": 1100,
+        "process": "機械練り",
+        "scent_type": "フローラル·甘め",
+        "scent_desc": "ラベンダー、イランイラン、トンカビーンズの甘く落ち着く香り",
+        "features": "オーガニックオートミール配合で肌を優しく整え、ラベンダーの香りでリラックスを促す石鹸。夜のバスタイムに最適です。",
+        "reviews": "「ラベンダーとバニラのような甘い香りが組み合わさって最高にリラックスできる」「お肌がすべすべになり乾燥もしない」「睡眠前の入浴に必須」との声。",
+        "skin_feel": "しっとり・すべすべ"
+      },
+      {
+        "id": 32,
+        "name": "ボヘミアン (Bohemian)",
+        "brand": "LUSH",
+        "price": 980,
+        "process": "機械練り",
+        "scent_type": "シトラス·柑橘",
+        "scent_desc": "レモン精油のジューシーで純粋な香り",
+        "features": "レモンオイルをふんだんに使用した、非常にシンプルでさっぱりとした石鹸。お肌のくすみを落とし、明るく引き締まった肌へ導きます。",
+        "reviews": "「本物のレモンを絞ったかのようなクリアな香りが良い」「すっきりとした洗い上がりで夏場に重宝する」「余分な皮脂がしっかり落ちる」と評価。",
+        "skin_feel": "さっぱり・クリア"
+      },
+      {
+        "id": 33,
+        "name": "サンドストーン (Sandstone)",
+        "brand": "LUSH",
+        "price": 980,
+        "process": "機械練り",
+        "scent_type": "シトラス·スパイシー",
+        "scent_desc": "コリアンダーとリツェアクベバの爽やかでエキゾチックな香り",
+        "features": "本物の砂（シリカ）を配合した強力なスクラブ石鹸。ヒジやヒザ、カカトなどのざらつきをしっかりと取り除き、ココナッツオイルが肌を保湿します。",
+        "reviews": "「かかとのガサガサや二の腕のブツブツがツルツルになる」「スクラブが結構粗いので優しく端正に使うと良い」「スパイシーなレモンの香りが心地よい」とのレビュー。",
+        "skin_feel": "ツルツル・さっぱり"
+      },
+      {
+        "id": 34,
+        "name": "シアソープ ミルク",
+        "brand": "L'OCCITANE",
+        "price": 1100,
+        "process": "機械練り",
+        "scent_type": "マイルド・甘め",
+        "scent_desc": "シアの優しいミルク（ベビーパウダーのようなほのかな香り）",
+        "features": "シアバターをベースにした優しい洗い上がりのソープ。肌を乾燥から守り、デリケートな肌も優しく洗い上げます。ファミリーで使える定番品。",
+        "reviews": "「赤ちゃんのお肌のようにもちもちになる」「つっぱり感が全くなく、優しく洗える」「ほのかな香りで誰にでも好まれる」と根強い支持。",
+        "skin_feel": "しっとり・なめらか"
+      },
+      {
+        "id": 35,
+        "name": "シアソープ ヴァーベナ",
+        "brand": "L'OCCITANE",
+        "price": 1100,
+        "process": "機械練り",
+        "scent_type": "シトラス·柑橘",
+        "scent_desc": "ヴァーベナのレモンに似た爽やかで涼しげな香り",
+        "features": "ロクシタンで大人気のヴァーベナエキスを配合。シアバターによる保湿力は維持しながら、爽快感のある香りでリフレッシュできます。",
+        "reviews": "「ヴァーベナの爽やかな香りがお風呂場いっぱいに広がってリフレッシュできる」「洗い上がりがすっきりしつつもシアバターの潤いを感じる」と高評価。",
+        "skin_feel": "すっきり・しっとり"
+      },
+      {
+        "id": 36,
+        "name": "シアソープ ラベンダー",
+        "brand": "L'OCCITANE",
+        "price": 1100,
+        "process": "機械練り",
+        "scent_type": "フローラル·ハーブ",
+        "scent_desc": "南仏プロヴァンスの澄み渡るラベンダーの香り",
+        "features": "ラベンダー精油とシアバターを配合。リラックスを誘う香りに包まれながら、乾燥しがちな肌を潤いで満たす石鹸です。",
+        "reviews": "「上品なラベンダーの香りで贅沢な気持ちになる」「泡立ちが非常にクリーミーで肌当たりが良い」「ボディ用として使うと肌が粉を吹かなくなった」との声。",
+        "skin_feel": "しっとり・クリーミー"
+      },
+      {
+        "id": 37,
+        "name": "ラベンダーソープ",
+        "brand": "WELEDA",
+        "price": 1100,
+        "process": "機械練り",
+        "scent_type": "フローラル·ハーブ",
+        "scent_desc": "本物のオーガニックラベンダー精油の穏やかな香り",
+        "features": "パーム油やヤシ油などの植物ベースで作られた、肌にマイルドなオーガニック石鹸。ラベンダーエッセンシャルオイルが気分を穏やかに落ち着かせます。",
+        "reviews": "「ナチュラルコスメの安心感がある」「ラベンダーの香りがきつすぎず、深呼吸したくなる香り」「すっきりした泡立ちで洗い流しやすい」と好評。",
+        "skin_feel": "すべすべ・マイルド"
+      },
+      {
+        "id": 38,
+        "name": "ローズソープ",
+        "brand": "WELEDA",
+        "price": 1430,
+        "process": "機械練り",
+        "scent_type": "フローラル・甘め",
+        "scent_desc": "ダマスクローズの気品ある贅沢な香り",
+        "features": "ワイルドローズオイルなどを配合し、保湿力を高めた贅沢なオーガニックソープ。ダマスクローズの豊かな香りが女性らしさを引き立てます。",
+        "reviews": "「本物のバラの香りがして優雅な気分になれる」「ヴェレダの中でも特にしっとりする使用感」「自分へのプチご褒美ボディソープとして使用」との声。",
+        "skin_feel": "しっとり・なめらか"
+      },
+      {
+        "id": 39,
+        "name": "シトラスソープ",
+        "brand": "WELEDA",
+        "price": 1100,
+        "process": "機械練り",
+        "scent_type": "シトラス·柑橘",
+        "scent_desc": "レモンとシトラスの爽快でクリアな香り",
+        "features": "もぎたての柑橘を思わせるレモン精油を配合。すっきりとした洗い上がりで、肌のベタつきを抑え清浄に保ちます。",
+        "reviews": "「レモンの香りが非常にフレッシュで朝のシャワーにぴったり」「さっぱり洗えて肌が明るくなる印象」と評価。",
+        "skin_feel": "さっぱり・爽快"
+      },
+      {
+        "id": 40,
+        "name": "ゼラニウム＆オレンジソープ",
+        "brand": "NEAL'S YARD REMEDIES",
+        "price": 2090,
+        "process": "機械練り",
+        "scent_type": "フローラル・シトラス",
+        "scent_desc": "ゼラニウムの甘さとオレンジの明るく爽やかな香り",
+        "features": "オーガニック認定率96%以上。ココナッツオイルやシアバターベースで、肌を潤しながら、ベストセラーの香りで気分を前向きにします。",
+        "reviews": "「ニールズヤードのこの香りが一番好きで、浴室中がアロマサロンのようになる」「洗い上がりもしっとりで満足」「泡が非常にきめ細かい」と高評価。",
+        "skin_feel": "しっとり・しなやか"
+      },
+      {
+        "id": 41,
+        "name": "ガーデンミント＆ベルガモットソープ",
+        "brand": "NEAL'S YARD REMEDIES",
+        "price": 2090,
+        "process": "機械練り",
+        "scent_type": "ハーブ・シトラス",
+        "scent_desc": "スペアミントの爽快感とベルガモットの気品ある柑橘の香り",
+        "features": "庭に生い茂るフレッシュなミントと、フルーティーなベルガモットをブレンド。肌をすっきりと清浄にし、爽やかな香り立ちでリフレッシュします。",
+        "reviews": "「爽快で上品なハーブ調の香りが素晴らしい」「夏のボディウォッシュに最適でベタつきが解消する」「つっぱらず適度に潤う」との声。",
+        "skin_feel": "すっきり・すべすべ"
+      },
+      {
+        "id": 42,
+        "name": "ワイルドローズソープ",
+        "brand": "NEAL'S YARD REMEDIES",
+        "price": 2420,
+        "process": "機械練り",
+        "scent_type": "フローラル・甘め",
+        "scent_desc": "ワイルドローズ（ノバラ）の高記で深みのあるハーブフローラル香",
+        "features": "ビタミン豊富なローズヒップオイルを配合し、エイジング肌や乾燥肌に高い保湿力と輝きを与える贅沢な石鹸。ハーブ調の奥深いローズの香り。",
+        "reviews": "「とにかく香りのクオリティが高く、贅沢なバスタイムになる」「洗い上がりのもっちり感が他の石鹸と違う」「ご褒美ギフトとして定番」と大人気。",
+        "skin_feel": "もっちり・うるおい"
+      },
+      {
+        "id": 43,
+        "name": "ローソープ Sou",
+        "brand": "OSAJI",
+        "price": 2420,
+        "process": "半熟",
+        "scent_type": "シトラス・ウッディ",
+        "scent_desc": "ユズとオレンジのジューシーな柑橘にほのかに木々の香り",
+        "features": "石鹸の製造過程で生じるグリセリン（天然保湿成分）をそのまま残す「半熟製法」を採用。バターのように柔らかく、驚くほどの保湿力とキメ細かい泡が特徴。",
+        "reviews": "「洗顔用だが全身に使いたくなるほどしっとりする」「みずみずしい柚子の香りが心地よい」「泡がホイップクリームのように濃密」と高い支持。",
+        "skin_feel": "超しっとり・吸い付くような肌"
+      },
+      {
+        "id": 44,
+        "name": "ローソープ Kokyu",
+        "brand": "OSAJI",
+        "price": 2420,
+        "process": "半熟",
+        "scent_type": "ハーブ・ウッディ",
+        "scent_desc": "ティーツリー、ローズマリー、ラベンダーの深呼吸したくなる香り",
+        "features": "半熟製法のしっとり感はそのままに、すっきりとしたハーブ精油をブレンド. 肌トラブルを防ぎながら、深いリラックス効果をもたらします。",
+        "reviews": "「名前の通り深呼吸したくなる森林のような香り」「お肌の赤みが引いてしっとり仕上がる」「スパのような贅沢感がある」との口コミ。",
+        "skin_feel": "超しっとり・滑らか"
+      },
+      {
+        "id": 45,
+        "name": "ローソープ Muku",
+        "brand": "OSAJI",
+        "price": 2420,
+        "process": "半熟",
+        "scent_type": "無香料",
+        "scent_desc": "香料無添加（原料のほのかな石鹸の香り）",
+        "features": "敏感肌に徹底して寄り添った無香料・低刺激タイプ。半熟製法の驚異的な泡立ちと保湿力をダイレクトに感じられます。全身のひどい乾燥にお悩みの方へ。",
+        "reviews": "「どんなに肌が荒れていてもこれならしみない」「保湿力が抜群で、冬場でもつっぱりを知らない肌になる」と非常に高い信頼を得ています。",
+        "skin_feel": "超しっとり・もちもち"
+      },
+      {
+        "id": 46,
+        "name": "ローソープ Urara",
+        "brand": "OSAJI",
+        "price": 2420,
+        "process": "半熟",
+        "scent_type": "フローラル·ハーブ",
+        "scent_desc": "ラベンダー、ローズマリー、ゼラニウムの春の庭園を思わせる香り",
+        "features": "季節限定から定番化した人気の香り。肌を柔らかく整える成分と、フローラルハーブの優しく爽やかな香りが特徴の半熟石鹸です。",
+        "reviews": "「ハーブとほのかなお花の香りが本当に心地よい」「洗い上がりのしっとりもちもち感が素晴らしく、全身を洗うご褒美にしている」との声。",
+        "skin_feel": "超しっとり・なめらか"
+      },
+      {
+        "id": 47,
+        "name": "酒かす石けん",
+        "brand": "SHIRO",
+        "price": 1650,
+        "process": "枠練り",
+        "scent_type": "甘め・和風",
+        "scent_desc": "伝統的な日本酒の酒かす由来のほのかに甘い上品な香り",
+        "features": "北海道・栗山町の老舗酒蔵の酒かすを使用。アミノ酸や酵母が肌に潤いを与え、キメを整えてもちもちとした透明感のあるお肌に洗い上げます。",
+        "reviews": "「使った後に肌のトーンが上がって白くなった気がする」「酒粕の甘い香りが優しくて落ち着く」「もっちり吸い付くような肌になる」と大人気。",
+        "skin_feel": "もちもち・しっとり"
+      },
+      {
+        "id": 48,
+        "name": "タマヌ石けん",
+        "brand": "SHIRO",
+        "price": 2200,
+        "process": "枠練り",
+        "scent_type": "ハーブ・ウッディ",
+        "scent_desc": "タマヌオイル特有のナッツ調で深みのあるハーバル香",
+        "features": "古来より皮膚の万能薬として知られる「タマヌオイル」を贅沢に配合。肌荒れを防ぎ、乾燥の厳しい肌に強い潤いを与えます。",
+        "reviews": "「乾燥による肌荒れやごわつきが数日で柔らかくなった」「ウッディな独特の香りでラグジュアリー」「非常にしっとりする」との評価。",
+        "skin_feel": "しっとり・なめらか"
+      },
+      {
+        "id": 49,
+        "name": "ボディウォッシュ バー ラベンダー＆ミント",
+        "brand": "Ethique",
+        "price": 1210,
+        "process": "機械練り",
+        "scent_type": "フローラル·ハーブ",
+        "scent_desc": "ラベンダーの優しさとミントの爽快な香り",
+        "features": "ニュージーランド発、プラスチックフリーにこだわった固形バー。ココナッツオイルベースで、余分な角質を取り除きながらしっとり優しく洗い上げます。",
+        "reviews": "「環境に優しく、かつ泡立ちや香りも素晴らしい」「ラベンダーとミントのすっきりした甘さが丁度いい」「泡切れが早くて使いやすい」と評判。",
+        "skin_feel": "すべすべ・さっぱり"
+      },
+      {
+        "id": 50,
+        "name": "ボディウォッシュ バー ココナッツ＆ライム",
+        "brand": "Ethique",
+        "price": 1210,
+        "process": "機械練り",
+        "scent_type": "フローラル・甘め",
+        "scent_desc": "ココナッツの甘い香りにライムの爽やかさをプラスした香り",
+        "features": "保湿効果の高いココナッツオイルとライム油を配合。トロピカルで甘く爽やかな香りに包まれながら、乾燥しがちな肌に潤いを与えます。",
+        "reviews": "「甘いココナッツにライムの酸味が効いていて、海外のリゾートにいる気分」「しっかり保湿されて肌がもちもちする」「泡立ちが良い」と高評価。",
+        "skin_feel": "しっとり・もちもち"
+      }
+    ];
+
+    // GAS Integration variables
+    let gasUrl = localStorage.getItem('soap_gas_url') || '';
+    let syncPassword = localStorage.getItem('soap_sync_password') || '';
+    let syncPending = localStorage.getItem('soap_sync_pending') === 'true';
+
+    // Local Storage persistence logic (Supports array to object migration)
+    let favorites = JSON.parse(localStorage.getItem('soap_favorites')) || [];
+    let purchased = {};
+    
+    // Migration check
+    const purchasedRaw = localStorage.getItem('soap_purchased');
+    if (purchasedRaw) {
+      try {
+        const parsed = JSON.parse(purchasedRaw);
+        if (Array.isArray(parsed)) {
+          // Migrate old array structure to new object structure
+          parsed.forEach(id => {
+            const soapObj = soaps.find(s => s.id === id);
+            const catalogPrice = soapObj ? soapObj.price : '';
+            purchased[id] = { date: '', notes: '', startDate: '', endDate: '', price: catalogPrice };
+          });
+          localStorage.setItem('soap_purchased', JSON.stringify(purchased));
+        } else {
+          purchased = parsed;
+          let migrated = false;
+          Object.keys(purchased).forEach(id => {
+            if (purchased[id].startDate === undefined) {
+              purchased[id].startDate = '';
+              migrated = true;
+            }
+            if (purchased[id].endDate === undefined) {
+              purchased[id].endDate = '';
+              migrated = true;
+            }
+            if (purchased[id].price === undefined || purchased[id].price === null) {
+              const soapObj = soaps.find(s => s.id === parseInt(id));
+              purchased[id].price = soapObj ? soapObj.price : '';
+              migrated = true;
+            }
+          });
+          if (migrated) {
+            localStorage.setItem('soap_purchased', JSON.stringify(purchased));
+          }
+        }
+      } catch (e) {
+        purchased = {};
+      }
+    }
+
+    let activeTab = 'all';
+
+    const grid = document.getElementById('soap-grid');
+    const searchInput = document.getElementById('search');
+    const priceRange = document.getElementById('price-range');
+    const priceVal = document.getElementById('price-val');
+    const processFilter = document.getElementById('process-filter');
+    const scentFilter = document.getElementById('scent-filter');
+    const sortSelect = document.getElementById('sort-select');
+    const resultsCount = document.getElementById('results-count');
+    
+    // Badge Elements
+    const totalBadge = document.getElementById('total-badge');
+    const favBadge = document.getElementById('fav-badge');
+    const purBadge = document.getElementById('pur-badge');
+
+    // Update Counts on Badges
+    function updateBadges() {
+      totalBadge.textContent = soaps.length;
+      favBadge.textContent = favorites.length;
+      purBadge.textContent = Object.keys(purchased).length;
+    }
+
+    // Toggle Favorite
+    window.toggleFavorite = function(id) {
+      const index = favorites.indexOf(id);
+      if (index === -1) {
+        favorites.push(id);
+      } else {
+        favorites.splice(index, 1);
+      }
+      localStorage.setItem('soap_favorites', JSON.stringify(favorites));
+      updateBadges();
+      filterData();
+      triggerQueueSync();
+    }
+
+    // Toggle Purchased
+    window.togglePurchased = function(id) {
+      if (purchased[id]) {
+        delete purchased[id];
+      } else {
+        // カタログ価格をデフォルトの購入金額として設定
+        const soapObj = soaps.find(s => s.id === id);
+        const catalogPrice = soapObj ? soapObj.price : '';
+        purchased[id] = { date: '', notes: '', startDate: '', endDate: '', price: catalogPrice };
+      }
+      localStorage.setItem('soap_purchased', JSON.stringify(purchased));
+      updateBadges();
+      filterData();
+      triggerQueueSync();
+    }
+
+    // Update Purchase Details (date, notes, startDate, endDate, price)
+    window.updatePurchaseDetails = function(id, key, val) {
+      if (!purchased[id]) {
+        const soapObj = soaps.find(s => s.id === id);
+        const catalogPrice = soapObj ? soapObj.price : '';
+        purchased[id] = { date: '', notes: '', startDate: '', endDate: '', price: catalogPrice };
+      }
+      
+      if (key === 'price') {
+        purchased[id][key] = val === '' ? '' : parseFloat(val);
+      } else {
+        purchased[id][key] = val;
+      }
+      
+      localStorage.setItem('soap_purchased', JSON.stringify(purchased));
+      updateBadges();
+      
+      // コスパ表示を再計算して書き換え
+      updateCostDisplay(id);
+      
+      // ソート順やフィルターに影響するキーの変更時は再レンダリング
+      if (key === 'date' || key === 'startDate' || key === 'endDate' || key === 'price') {
+        filterData();
+      }
+      triggerQueueSync();
+    }
+
+    // Render Soaps
+    function render(data) {
+      grid.innerHTML = '';
+      if (data.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">条件に一致する石鹸が見つかりませんでした。</div>';
+        resultsCount.textContent = '0件の石鹸が見つかりました';
+        return;
+      }
+
+      resultsCount.textContent = `${data.length}件の石鹸が見つかりました`;
+
+      data.forEach(soap => {
+        const isFav = favorites.includes(soap.id);
+        const isBought = !!purchased[soap.id];
+        const buyDetails = purchased[soap.id] || { date: '', notes: '' };
+        
+        // Generate Google Search Link dynamically
+        const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(soap.brand + ' ' + soap.name)}`;
+
+        const card = document.createElement('div');
+        card.className = 'soap-card fade-in';
+        card.innerHTML = `
+          <div class="card-actions">
+            <button class="action-btn fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(${soap.id})" title="${isFav ? 'お気に入りから外す' : 'お気に入りに登録'}">
+              ${isFav ? '★' : '☆'}
+            </button>
+            <button class="action-btn buy-btn ${isBought ? 'active' : ''}" onclick="togglePurchased(${soap.id})" title="${isBought ? '買った記録から外す' : '買った記録に追加'}">
+              ✓
+            </button>
+          </div>
+          <div>
+            <div class="card-header">
+              <span class="brand-tag">${soap.brand}</span>
+              <h3 class="soap-name">${soap.name}</h3>
+              <div class="meta-badges">
+                <span class="badge price">¥${soap.price.toLocaleString()}</span>
+                <span class="badge">${soap.process}</span>
+                <span class="badge">${soap.scent_type}</span>
+              </div>
+            </div>
+            <div class="soap-features">
+              <strong>【特徴】</strong> ${soap.features}
+              <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+                <strong>香り:</strong> ${soap.scent_desc}
+              </div>
+            </div>
+            <div class="soap-reviews">
+              "${soap.reviews}"
+            </div>
+            
+            <!-- Purchase details form (only visible if purchased) -->
+            <div class="purchase-form ${isBought ? '' : 'hidden'}">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <div class="form-group">
+                  <label>購入日</label>
+                  <input type="date" class="form-input" value="${buyDetails.date || ''}" onchange="updatePurchaseDetails(${soap.id}, 'date', this.value)">
+                </div>
+                <div class="form-group">
+                  <label>購入金額 (税込)</label>
+                  <input type="number" class="form-input" min="0" placeholder="価格" value="${buyDetails.price !== undefined ? buyDetails.price : ''}" onchange="updatePurchaseDetails(${soap.id}, 'price', this.value)">
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <div class="form-group">
+                  <label>使用開始日</label>
+                  <input type="date" class="form-input" value="${buyDetails.startDate || ''}" onchange="updatePurchaseDetails(${soap.id}, 'startDate', this.value)">
+                </div>
+                <div class="form-group">
+                  <label>使用終了日</label>
+                  <input type="date" class="form-input" value="${buyDetails.endDate || ''}" onchange="updatePurchaseDetails(${soap.id}, 'endDate', this.value)">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>感想メモ</label>
+                <textarea class="form-input textarea" placeholder="使用感、香り立ちなど..." onchange="updatePurchaseDetails(${soap.id}, 'notes', this.value)">${buyDetails.notes || ''}</textarea>
+              </div>
+              <!-- Daily Cost Display -->
+              <div id="cost-display-${soap.id}" class="cost-display-text" style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--accent-hover); font-weight: 600; display: none; padding-top: 0.25rem; border-top: 1px dashed var(--border-color);">
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div>
+              <span class="feel-label">使用感:</span>
+              <span class="feel-val">${soap.skin_feel}</span>
+            </div>
+            <a href="${googleSearchUrl}" target="_blank" rel="noopener noreferrer" class="btn-link">
+              <span>🔍</span> Google検索
+            </a>
+          </div>
+        `;
+        grid.appendChild(card);
+        // コスパ表示の更新
+        updateCostDisplay(soap.id);
+      });
+    }
+
+    // --- Cost Calculator Helpers ---
+    function calculateDailyCost(buyDetails) {
+      if (!buyDetails) return null;
+      const price = parseFloat(buyDetails.price);
+      const start = buyDetails.startDate;
+      const end = buyDetails.endDate;
+      
+      if (!isNaN(price) && start && end) {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        if (endDate >= startDate) {
+          const diffTime = Math.abs(endDate - startDate);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // 開始日と終了日を含むため+1
+          const cost = price / diffDays;
+          return {
+            days: diffDays,
+            cost: cost // 小数点以下も含む
+          };
+        }
+      }
+      return null;
+    }
+
+    function updateCostDisplay(id) {
+      const container = document.getElementById(`cost-display-${id}`);
+      if (!container) return;
+      
+      const buyDetails = purchased[id];
+      const costInfo = calculateDailyCost(buyDetails);
+      
+      if (costInfo) {
+        container.innerHTML = `💸 コスパ: <strong>${costInfo.cost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} 円</strong>/日 (${costInfo.days}日間使用)`;
+        container.style.display = 'block';
+      } else {
+        container.innerHTML = '';
+        container.style.display = 'none';
+      }
+    }
+
+    // Filter and Sort Logic
+    function filterData() {
+      const query = searchInput.value.toLowerCase().trim();
+      const maxPrice = parseInt(priceRange.value);
+      const selectedProcess = processFilter.value;
+      const selectedScent = scentFilter.value;
+      const sortBy = sortSelect.value;
+
+      let filtered = soaps.filter(soap => {
+        // Tab check
+        if (activeTab === 'favorites' && !favorites.includes(soap.id)) return false;
+        if (activeTab === 'purchased' && !purchased[soap.id]) return false;
+
+        // Search text match
+        const matchesQuery = 
+          soap.name.toLowerCase().includes(query) ||
+          soap.brand.toLowerCase().includes(query) ||
+          soap.features.toLowerCase().includes(query) ||
+          soap.scent_desc.toLowerCase().includes(query) ||
+          soap.scent_type.toLowerCase().includes(query);
+
+        // Price match
+        const matchesPrice = soap.price <= maxPrice;
+
+        // Process match
+        const matchesProcess = 
+          selectedProcess === 'all' || 
+          soap.process === selectedProcess ||
+          (selectedProcess === '半熟' && soap.process.includes('半熟'));
+
+        // Scent match
+        let matchesScent = false;
+        if (selectedScent === 'all') {
+          matchesScent = true;
+        } else {
+          matchesScent = soap.scent_type.includes(selectedScent) || soap.scent_desc.includes(selectedScent);
+        }
+
+        return matchesQuery && matchesPrice && matchesProcess && matchesScent;
+      });
+
+      // Sorting implementation
+      if (sortBy === 'price-asc') {
+        filtered.sort((a, b) => a.price - b.price);
+      } else if (sortBy === 'price-desc') {
+        filtered.sort((a, b) => b.price - a.price);
+      } else if (sortBy === 'date-desc') {
+        filtered.sort((a, b) => {
+          const dateA = purchased[a.id]?.date || '';
+          const dateB = purchased[b.id]?.date || '';
+          if (!dateA && !dateB) return a.id - b.id; // Unpurchased sorted by ID
+          if (!dateA) return 1;  // Unpurchased to the bottom
+          if (!dateB) return -1;
+          return new Date(dateB) - new Date(dateA); // Newest first
+        });
+      } else if (sortBy === 'date-asc') {
+        filtered.sort((a, b) => {
+          const dateA = purchased[a.id]?.date || '';
+          const dateB = purchased[b.id]?.date || '';
+          if (!dateA && !dateB) return a.id - b.id; // Unpurchased sorted by ID
+          if (!dateA) return 1;  // Unpurchased to the bottom
+          if (!dateB) return -1;
+          return new Date(dateA) - new Date(dateB); // Oldest first
+        });
+      } else if (sortBy === 'cost-asc') {
+        filtered.sort((a, b) => {
+          const costA = calculateDailyCost(purchased[a.id]);
+          const costB = calculateDailyCost(purchased[b.id]);
+          if (!costA && !costB) return a.id - b.id;
+          if (!costA) return 1;  // コスト計算できないものを下に
+          if (!costB) return -1;
+          return costA.cost - costB.cost; // コスパが良い（安い）順
+        });
+      } else if (sortBy === 'cost-desc') {
+        filtered.sort((a, b) => {
+          const costA = calculateDailyCost(purchased[a.id]);
+          const costB = calculateDailyCost(purchased[b.id]);
+          if (!costA && !costB) return a.id - b.id;
+          if (!costA) return 1;  // コスト計算できないものを下に
+          if (!costB) return -1;
+          return costB.cost - costA.cost; // コスパが悪い（高い）順
+        });
+      }
+
+      render(filtered);
+    }
+
+    // Event Listeners for Filters
+    searchInput.addEventListener('input', filterData);
+    
+    priceRange.addEventListener('input', (e) => {
+      priceVal.textContent = `¥${parseInt(e.target.value).toLocaleString()}`;
+      filterData();
+    });
+
+    processFilter.addEventListener('change', filterData);
+    scentFilter.addEventListener('change', filterData);
+    sortSelect.addEventListener('change', filterData);
+
+    // Event Listeners for Tab Buttons
+    document.querySelectorAll('.tab-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        const targetBtn = e.currentTarget;
+        targetBtn.classList.add('active');
+        activeTab = targetBtn.getAttribute('data-tab');
+        filterData();
+      });
+    });
+
+    // --- Cloud Sync Logic ---
+
+    // 同期ステータス表示 of UI
+    function updateSyncStatus(status, timeInfo = '') {
+      const badge = document.getElementById('sync-status');
+      if (!badge) return;
+      badge.className = 'sync-status-badge';
+      
+      switch (status) {
+        case 'unconfigured':
+          badge.classList.add('status-unconfigured');
+          badge.textContent = '📴 同期未設定（ローカル保存）';
+          break;
+        case 'syncing':
+          badge.classList.add('status-syncing');
+          badge.textContent = '🔄 同期中...';
+          break;
+        case 'success':
+          badge.classList.add('status-success');
+          badge.textContent = `🟢 同期完了 (${timeInfo || getFormattedTime()})`;
+          break;
+        case 'pending':
+          badge.classList.add('status-pending');
+          badge.textContent = '⚠️ 未同期データあり (オフライン操作分)';
+          break;
+        case 'error':
+          badge.classList.add('status-error');
+          badge.textContent = '❌ 同期エラー（URL・接続確認）';
+          break;
+      }
+    }
+
+    function getFormattedTime() {
+      const now = new Date();
+      return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    }
+
+    // 起動時の同期処理
+    async function performSyncOnStartup() {
+      if (!gasUrl) return;
+      
+      updateSyncStatus('syncing');
+      
+      try {
+        if (syncPending) {
+          // 未送信のローカルデータがある場合は、先にPOSTしてローカルデータをスプレッドシートに反映させる
+          const success = await postDataToGas();
+          if (success) {
+            syncPending = false;
+            localStorage.setItem('soap_sync_pending', 'false');
+          } else {
+            throw new Error('Pending post failed');
+          }
+        }
+        
+        // スプレッドシートからデータをGET
+        const cloudData = await getDataFromGas();
+        if (cloudData) {
+          mergeCloudData(cloudData);
+          updateSyncStatus('success');
+        } else {
+          throw new Error('Fetch failed');
+        }
+      } catch (e) {
+        console.error('Startup sync error:', e);
+        if (syncPending) {
+          updateSyncStatus('pending');
+        } else {
+          updateSyncStatus('error');
+        }
+      }
+    }
+
+    // GASからデータをGET
+    async function getDataFromGas() {
+      if (!gasUrl || !syncPassword) return null;
+      try {
+        const urlWithAuth = `${gasUrl}?password=${encodeURIComponent(syncPassword)}`;
+        const response = await fetch(urlWithAuth, {
+          method: 'GET',
+          mode: 'cors'
+        });
+        if (response.ok) {
+          const resJson = await response.json();
+          // パスワード認証失敗時はエラーオブジェクトが返ってくる
+          if (resJson && resJson.status === 'error') {
+            console.error('GAS Authentication failed:', resJson.message);
+            return null;
+          }
+          return resJson;
+        }
+      } catch (e) {
+        console.error('GAS GET error:', e);
+      }
+      return null;
+    }
+
+    // GASへデータをPOST
+    async function postDataToGas() {
+      if (!gasUrl || !syncPassword) return false;
+      try {
+        // CORS対策としてContent-Typeをtext/plainに設定して送る（シンプルリクエスト）
+        const response = await fetch(gasUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain'
+          },
+          body: JSON.stringify({
+            favorites: favorites,
+            purchased: purchased,
+            password: syncPassword
+          }),
+          redirect: 'follow'
+        });
+        
+        if (response.ok) {
+          const resJson = await response.json();
+          return resJson && resJson.status === 'success';
+        }
+      } catch (e) {
+        console.error('GAS POST error:', e);
+      }
+      return false;
+    }
+
+    // クラウドデータをローカルにマージ
+    function mergeCloudData(cloudData) {
+      // cloudData of form: { "1": { favorite: true, purchased: true, date: "2026-05-20", notes: "...", startDate: "2026-05-21", endDate: "2026-05-25", price: 1200 }, ... }
+      const newFavorites = [];
+      const newPurchased = {};
+      
+      Object.keys(cloudData).forEach(idStr => {
+        const id = parseInt(idStr);
+        const item = cloudData[idStr];
+        
+        if (item.favorite) {
+          newFavorites.push(id);
+        }
+        
+        if (item.purchased) {
+          newPurchased[id] = {
+            date: item.date || '',
+            notes: item.notes || '',
+            startDate: item.startDate || '',
+            endDate: item.endDate || '',
+            price: item.price !== undefined && item.price !== '' ? parseFloat(item.price) : ''
+          };
+        }
+      });
+
+      favorites = newFavorites;
+      purchased = newPurchased;
+
+      localStorage.setItem('soap_favorites', JSON.stringify(favorites));
+      localStorage.setItem('soap_purchased', JSON.stringify(purchased));
+      
+      updateBadges();
+      filterData();
+    }
+
+    // GAS設定（URL & パスワード）の保存
+    window.saveGasConfig = async function() {
+      const inputUrl = document.getElementById('gas-url').value.trim();
+      const inputPassword = document.getElementById('sync-password').value.trim();
+      
+      if (!inputUrl || !inputPassword) {
+        // いずれかが空欄の場合は同期解除
+        gasUrl = '';
+        syncPassword = '';
+        localStorage.removeItem('soap_gas_url');
+        localStorage.removeItem('soap_sync_password');
+        const forceBtn = document.getElementById('force-sync-btn');
+        if (forceBtn) forceBtn.disabled = true;
+        updateSyncStatus('unconfigured');
+        alert('同期設定を解除しました。ローカル保存モードで動作します。');
+        return;
+      }
+      
+      gasUrl = inputUrl;
+      syncPassword = inputPassword;
+      localStorage.setItem('soap_gas_url', gasUrl);
+      localStorage.setItem('soap_sync_password', syncPassword);
+      
+      const forceBtn = document.getElementById('force-sync-btn');
+      if (forceBtn) forceBtn.disabled = false;
+      
+      // 設定直後は、現在のローカルデータをスプレッドシートへ一度送信して同期させる
+      updateSyncStatus('syncing');
+      try {
+        const postSuccess = await postDataToGas();
+        if (postSuccess) {
+          syncPending = false;
+          localStorage.setItem('soap_sync_pending', 'false');
+          
+          // その後最新データを一度GET
+          const cloudData = await getDataFromGas();
+          if (cloudData) {
+            mergeCloudData(cloudData);
+            updateSyncStatus('success');
+            alert('Googleスプレッドシートとの同期設定が成功しました！');
+          } else {
+            throw new Error('Get failed after setting');
+          }
+        } else {
+          throw new Error('Initial post failed');
+        }
+      } catch (e) {
+        console.error('GAS Config verification failed:', e);
+        updateSyncStatus('error');
+        alert('スプレッドシートへの接続に失敗しました。\n以下の点をご確認ください：\n1. ウェブアプリURLとパスワードが正しいか\n2. GASコード内の SECURITY_PASSWORD が今回のパスワードと一致しているか\n3. デプロイ設定で「アクセスできるユーザー」が「全員」になっているか');
+      }
+    }
+
+    // 手動同期トリガー
+    window.triggerManualSync = async function() {
+      if (!gasUrl) return;
+      updateSyncStatus('syncing');
+      
+      try {
+        const postSuccess = await postDataToGas();
+        if (postSuccess) {
+          syncPending = false;
+          localStorage.setItem('soap_sync_pending', 'false');
+          
+          const cloudData = await getDataFromGas();
+          if (cloudData) {
+            mergeCloudData(cloudData);
+            updateSyncStatus('success');
+          } else {
+            throw new Error('Fetch failed');
+          }
+        } else {
+          throw new Error('Post failed');
+        }
+      } catch (e) {
+        console.error('Manual sync error:', e);
+        updateSyncStatus('error');
+        alert('同期に失敗しました。ネットワーク接続またはURL設定を確認してください。');
+      }
+    }
+
+    // データ更新時の非同期同期処理
+    let debounceTimeout = null;
+    function triggerQueueSync() {
+      if (!gasUrl) return;
+      
+      updateSyncStatus('syncing');
+      syncPending = true;
+      localStorage.setItem('soap_sync_pending', 'true');
+      
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+      
+      debounceTimeout = setTimeout(async () => {
+        const success = await postDataToGas();
+        if (success) {
+          syncPending = false;
+          localStorage.setItem('soap_sync_pending', 'false');
+          updateSyncStatus('success');
+        } else {
+          updateSyncStatus('pending');
+        }
+      }, 1500);
+    }
+
+    // Initial Load & Listeners
+    window.addEventListener('DOMContentLoaded', async () => {
+      // GAS URL & Password 初期表示
+      const gasUrlInput = document.getElementById('gas-url');
+      const syncPasswordInput = document.getElementById('sync-password');
+      if (gasUrlInput) {
+        gasUrlInput.value = gasUrl;
+      }
+      if (syncPasswordInput) {
+        syncPasswordInput.value = syncPassword;
+      }
+      
+      if (gasUrl && syncPassword) {
+        const forceBtn = document.getElementById('force-sync-btn');
+        if (forceBtn) forceBtn.disabled = false;
+        await performSyncOnStartup();
+      } else {
+        updateSyncStatus('unconfigured');
+      }
+      
+      // URL表示切り替えボタン
+      const toggleUrlBtn = document.getElementById('toggle-url-visibility');
+      if (toggleUrlBtn && gasUrlInput) {
+        toggleUrlBtn.addEventListener('click', () => {
+          if (gasUrlInput.type === 'password') {
+            gasUrlInput.type = 'text';
+            toggleUrlBtn.textContent = '非表示';
+          } else {
+            gasUrlInput.type = 'password';
+            toggleUrlBtn.textContent = '表示';
+          }
+        });
+      }
+
+      // パスワード表示切り替えボタン
+      const togglePwBtn = document.getElementById('toggle-password-visibility');
+      if (togglePwBtn && syncPasswordInput) {
+        togglePwBtn.addEventListener('click', () => {
+          if (syncPasswordInput.type === 'password') {
+            syncPasswordInput.type = 'text';
+            togglePwBtn.textContent = '非表示';
+          } else {
+            syncPasswordInput.type = 'password';
+            togglePwBtn.textContent = '表示';
+          }
+        });
+      }
+    });
+
+    // Initial Load
+    updateBadges();
+    render(soaps);
+  </script>
+</body>
+</html>
