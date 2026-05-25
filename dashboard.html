@@ -633,6 +633,78 @@
       margin-top: 0.25rem;
       list-style-type: circle;
     }
+
+    /* Rating Star Styles */
+    .rating-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .rating-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .rating-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .star-rating {
+      display: flex;
+      gap: 0.15rem;
+    }
+
+    .star-rating .star {
+      font-size: 1.2rem;
+      color: var(--border-color);
+      cursor: pointer;
+      transition: color 0.15s ease, transform 0.1s ease;
+      user-select: none;
+    }
+
+    .star-rating .star:hover {
+      transform: scale(1.2);
+    }
+
+    .star-rating .star.active {
+      color: #ffb703;
+      text-shadow: 0 0 2px rgba(255, 183, 3, 0.5);
+    }
+
+    /* Card Summary Bar */
+    .ratings-summary-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.75rem;
+      margin-bottom: 0.75rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .ratings-summary-bar.hidden {
+      display: none !important;
+    }
+
+    .summary-badge {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      background: rgba(143, 168, 155, 0.1);
+      color: var(--text-color);
+      font-weight: 500;
+      border: 1px solid rgba(143, 168, 155, 0.15);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+    }
   </style>
 </head>
 <body>
@@ -729,6 +801,12 @@
           <option value="date-asc">購入日が古い順</option>
           <option value="cost-asc">コスパが良い順 (1日あたり安価)</option>
           <option value="cost-desc">コスパが悪い順 (1日あたり高価)</option>
+          <option value="rating-desc">総合評価が高い順</option>
+          <option value="scent-desc">香り評価が高い順</option>
+          <option value="deodorant-desc">消臭効果が高い順</option>
+          <option value="foaming-desc">泡立ち評価が高い順</option>
+          <option value="dryness-desc">乾燥しにくさ順</option>
+          <option value="texture-desc">肌触り評価が高い順</option>
         </select>
       </div>
     </div>
@@ -1375,7 +1453,10 @@
           parsed.forEach(id => {
             const soapObj = soaps.find(s => s.id === id);
             const catalogPrice = soapObj ? soapObj.price : '';
-            purchased[id] = { date: '', notes: '', startDate: '', endDate: '', price: catalogPrice };
+            purchased[id] = { 
+              date: '', notes: '', startDate: '', endDate: '', price: catalogPrice,
+              ratingScent: 0, ratingDeodorant: 0, ratingFoaming: 0, ratingDryness: 0, ratingTexture: 0 
+            };
           });
           localStorage.setItem('soap_purchased', JSON.stringify(purchased));
         } else {
@@ -1393,6 +1474,26 @@
             if (purchased[id].price === undefined || purchased[id].price === null) {
               const soapObj = soaps.find(s => s.id === parseInt(id));
               purchased[id].price = soapObj ? soapObj.price : '';
+              migrated = true;
+            }
+            if (purchased[id].ratingScent === undefined) {
+              purchased[id].ratingScent = 0;
+              migrated = true;
+            }
+            if (purchased[id].ratingDeodorant === undefined) {
+              purchased[id].ratingDeodorant = 0;
+              migrated = true;
+            }
+            if (purchased[id].ratingFoaming === undefined) {
+              purchased[id].ratingFoaming = 0;
+              migrated = true;
+            }
+            if (purchased[id].ratingDryness === undefined) {
+              purchased[id].ratingDryness = 0;
+              migrated = true;
+            }
+            if (purchased[id].ratingTexture === undefined) {
+              purchased[id].ratingTexture = 0;
               migrated = true;
             }
           });
@@ -1450,7 +1551,10 @@
         // カタログ価格をデフォルトの購入金額として設定
         const soapObj = soaps.find(s => s.id === id);
         const catalogPrice = soapObj ? soapObj.price : '';
-        purchased[id] = { date: '', notes: '', startDate: '', endDate: '', price: catalogPrice };
+        purchased[id] = { 
+          date: '', notes: '', startDate: '', endDate: '', price: catalogPrice,
+          ratingScent: 0, ratingDeodorant: 0, ratingFoaming: 0, ratingDryness: 0, ratingTexture: 0 
+        };
       }
       localStorage.setItem('soap_purchased', JSON.stringify(purchased));
       updateBadges();
@@ -1458,16 +1562,21 @@
       triggerQueueSync();
     }
 
-    // Update Purchase Details (date, notes, startDate, endDate, price)
+    // Update Purchase Details (date, notes, startDate, endDate, price, ratings)
     window.updatePurchaseDetails = function(id, key, val) {
       if (!purchased[id]) {
         const soapObj = soaps.find(s => s.id === id);
         const catalogPrice = soapObj ? soapObj.price : '';
-        purchased[id] = { date: '', notes: '', startDate: '', endDate: '', price: catalogPrice };
+        purchased[id] = { 
+          date: '', notes: '', startDate: '', endDate: '', price: catalogPrice,
+          ratingScent: 0, ratingDeodorant: 0, ratingFoaming: 0, ratingDryness: 0, ratingTexture: 0 
+        };
       }
       
       if (key === 'price') {
         purchased[id][key] = val === '' ? '' : parseFloat(val);
+      } else if (key.startsWith('rating')) {
+        purchased[id][key] = val === '' ? 0 : parseInt(val);
       } else {
         purchased[id][key] = val;
       }
@@ -1479,7 +1588,7 @@
       updateCostDisplay(id);
       
       // ソート順やフィルターに影響するキーの変更時は再レンダリング
-      if (key === 'date' || key === 'startDate' || key === 'endDate' || key === 'price') {
+      if (key === 'date' || key === 'startDate' || key === 'endDate' || key === 'price' || key.startsWith('rating')) {
         filterData();
       }
       triggerQueueSync();
@@ -1561,9 +1670,63 @@
                 <label>感想メモ</label>
                 <textarea class="form-input textarea" placeholder="使用感、香り立ちなど..." onchange="updatePurchaseDetails(${soap.id}, 'notes', this.value)">${buyDetails.notes || ''}</textarea>
               </div>
+
+              <!-- 5つの評価軸 -->
+              <div class="rating-section">
+                <div class="rating-row">
+                  <span class="rating-label">👃 香り</span>
+                  <div class="star-rating" data-id="${soap.id}" data-key="ratingScent">
+                    ${[1, 2, 3, 4, 5].map(num => `
+                      <span class="star ${num <= (buyDetails.ratingScent || 0) ? 'active' : ''}" onclick="updatePurchaseDetails(${soap.id}, 'ratingScent', ${num})">★</span>
+                    `).join('')}
+                  </div>
+                </div>
+                <div class="rating-row">
+                  <span class="rating-label">🛡️ 消臭効果</span>
+                  <div class="star-rating" data-id="${soap.id}" data-key="ratingDeodorant">
+                    ${[1, 2, 3, 4, 5].map(num => `
+                      <span class="star ${num <= (buyDetails.ratingDeodorant || 0) ? 'active' : ''}" onclick="updatePurchaseDetails(${soap.id}, 'ratingDeodorant', ${num})">★</span>
+                    `).join('')}
+                  </div>
+                </div>
+                <div class="rating-row">
+                  <span class="rating-label">🫧 泡立ち</span>
+                  <div class="star-rating" data-id="${soap.id}" data-key="ratingFoaming">
+                    ${[1, 2, 3, 4, 5].map(num => `
+                      <span class="star ${num <= (buyDetails.ratingFoaming || 0) ? 'active' : ''}" onclick="updatePurchaseDetails(${soap.id}, 'ratingFoaming', ${num})">★</span>
+                    `).join('')}
+                  </div>
+                </div>
+                <div class="rating-row">
+                  <span class="rating-label">🌵 乾燥（保湿）</span>
+                  <div class="star-rating" data-id="${soap.id}" data-key="ratingDryness">
+                    ${[1, 2, 3, 4, 5].map(num => `
+                      <span class="star ${num <= (buyDetails.ratingDryness || 0) ? 'active' : ''}" onclick="updatePurchaseDetails(${soap.id}, 'ratingDryness', ${num})">★</span>
+                    `).join('')}
+                  </div>
+                </div>
+                <div class="rating-row">
+                  <span class="rating-label">✨ 肌触り</span>
+                  <div class="star-rating" data-id="${soap.id}" data-key="ratingTexture">
+                    ${[1, 2, 3, 4, 5].map(num => `
+                      <span class="star ${num <= (buyDetails.ratingTexture || 0) ? 'active' : ''}" onclick="updatePurchaseDetails(${soap.id}, 'ratingTexture', ${num})">★</span>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+
               <!-- Daily Cost Display -->
               <div id="cost-display-${soap.id}" class="cost-display-text" style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--accent-hover); font-weight: 600; display: none; padding-top: 0.25rem; border-top: 1px dashed var(--border-color);">
               </div>
+            </div>
+
+            <!-- Card Rating Summary (Visible on card if purchased) -->
+            <div class="ratings-summary-bar ${isBought ? '' : 'hidden'}">
+              <span class="summary-badge" title="香り: ${buyDetails.ratingScent || 0}つ星">👃 ★${buyDetails.ratingScent || 0}</span>
+              <span class="summary-badge" title="消臭効果: ${buyDetails.ratingDeodorant || 0}つ星">🛡️ ★${buyDetails.ratingDeodorant || 0}</span>
+              <span class="summary-badge" title="泡立ち: ${buyDetails.ratingFoaming || 0}つ星">🫧 ★${buyDetails.ratingFoaming || 0}</span>
+              <span class="summary-badge" title="乾燥（保湿）: ${buyDetails.ratingDryness || 0}つ星">🌵 ★${buyDetails.ratingDryness || 0}</span>
+              <span class="summary-badge" title="肌触り: ${buyDetails.ratingTexture || 0}つ星">✨ ★${buyDetails.ratingTexture || 0}</span>
             </div>
           </div>
           <div class="card-footer">
@@ -1580,6 +1743,18 @@
         // コスパ表示の更新
         updateCostDisplay(soap.id);
       });
+    }
+
+    // --- Rating Helpers ---
+    function getAvgRating(buyDetails) {
+      if (!buyDetails) return 0;
+      const scent = buyDetails.ratingScent || 0;
+      const deodorant = buyDetails.ratingDeodorant || 0;
+      const foaming = buyDetails.ratingFoaming || 0;
+      const dryness = buyDetails.ratingDryness || 0;
+      const texture = buyDetails.ratingTexture || 0;
+      const sum = scent + deodorant + foaming + dryness + texture;
+      return sum > 0 ? (sum / 5) : 0;
     }
 
     // --- Cost Calculator Helpers ---
@@ -1702,6 +1877,60 @@
           if (!costA) return 1;  // コスト計算できないものを下に
           if (!costB) return -1;
           return costB.cost - costA.cost; // コスパが悪い（高い）順
+        });
+      } else if (sortBy === 'rating-desc') {
+        filtered.sort((a, b) => {
+          const avgA = getAvgRating(purchased[a.id]);
+          const avgB = getAvgRating(purchased[b.id]);
+          if (avgA === 0 && avgB === 0) return a.id - b.id;
+          if (avgA === 0) return 1;
+          if (avgB === 0) return -1;
+          return avgB - avgA;
+        });
+      } else if (sortBy === 'scent-desc') {
+        filtered.sort((a, b) => {
+          const rA = purchased[a.id]?.ratingScent || 0;
+          const rB = purchased[b.id]?.ratingScent || 0;
+          if (rA === 0 && rB === 0) return a.id - b.id;
+          if (rA === 0) return 1;
+          if (rB === 0) return -1;
+          return rB - rA;
+        });
+      } else if (sortBy === 'deodorant-desc') {
+        filtered.sort((a, b) => {
+          const rA = purchased[a.id]?.ratingDeodorant || 0;
+          const rB = purchased[b.id]?.ratingDeodorant || 0;
+          if (rA === 0 && rB === 0) return a.id - b.id;
+          if (rA === 0) return 1;
+          if (rB === 0) return -1;
+          return rB - rA;
+        });
+      } else if (sortBy === 'foaming-desc') {
+        filtered.sort((a, b) => {
+          const rA = purchased[a.id]?.ratingFoaming || 0;
+          const rB = purchased[b.id]?.ratingFoaming || 0;
+          if (rA === 0 && rB === 0) return a.id - b.id;
+          if (rA === 0) return 1;
+          if (rB === 0) return -1;
+          return rB - rA;
+        });
+      } else if (sortBy === 'dryness-desc') {
+        filtered.sort((a, b) => {
+          const rA = purchased[a.id]?.ratingDryness || 0;
+          const rB = purchased[b.id]?.ratingDryness || 0;
+          if (rA === 0 && rB === 0) return a.id - b.id;
+          if (rA === 0) return 1;
+          if (rB === 0) return -1;
+          return rB - rA;
+        });
+      } else if (sortBy === 'texture-desc') {
+        filtered.sort((a, b) => {
+          const rA = purchased[a.id]?.ratingTexture || 0;
+          const rB = purchased[b.id]?.ratingTexture || 0;
+          if (rA === 0 && rB === 0) return a.id - b.id;
+          if (rA === 0) return 1;
+          if (rB === 0) return -1;
+          return rB - rA;
         });
       }
 
@@ -1876,7 +2105,12 @@
             notes: item.notes || '',
             startDate: item.startDate || '',
             endDate: item.endDate || '',
-            price: item.price !== undefined && item.price !== '' ? parseFloat(item.price) : ''
+            price: item.price !== undefined && item.price !== '' ? parseFloat(item.price) : '',
+            ratingScent: item.ratingScent !== undefined && item.ratingScent !== '' ? parseInt(item.ratingScent) : 0,
+            ratingDeodorant: item.ratingDeodorant !== undefined && item.ratingDeodorant !== '' ? parseInt(item.ratingDeodorant) : 0,
+            ratingFoaming: item.ratingFoaming !== undefined && item.ratingFoaming !== '' ? parseInt(item.ratingFoaming) : 0,
+            ratingDryness: item.ratingDryness !== undefined && item.ratingDryness !== '' ? parseInt(item.ratingDryness) : 0,
+            ratingTexture: item.ratingTexture !== undefined && item.ratingTexture !== '' ? parseInt(item.ratingTexture) : 0
           };
         }
       });

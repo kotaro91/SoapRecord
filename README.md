@@ -165,7 +165,7 @@ function doGet(e) {
   var data = sheet.getDataRange().getValues();
   var result = {};
   
-  // 1行目はヘッダー [ID, お気に入り, 購入済み, 購入日, 感想メモ, 使用開始日, 使用終了日, 購入金額]
+  // 1行目はヘッダー [ID, お気に入り, 購入済み, 購入日, 感想メモ, 使用開始日, 使用終了日, 購入金額, 香り評価, 消臭効果評価, 泡立ち評価, 乾燥評価, 肌触り評価]
   // 2行目以降がデータ
   for (var i = 1; i < data.length; i++) {
     var id = data[i][0];
@@ -177,7 +177,12 @@ function doGet(e) {
       notes: data[i][4] || "",
       startDate: data[i][5] ? formatDate(data[i][5]) : "",
       endDate: data[i][6] ? formatDate(data[i][6]) : "",
-      price: data[i][7] !== undefined && data[i][7] !== "" ? Number(data[i][7]) : ""
+      price: data[i][7] !== undefined && data[i][7] !== "" ? Number(data[i][7]) : "",
+      ratingScent: data[i][8] !== undefined && data[i][8] !== "" ? Number(data[i][8]) : 0,
+      ratingDeodorant: data[i][9] !== undefined && data[i][9] !== "" ? Number(data[i][9]) : 0,
+      ratingFoaming: data[i][10] !== undefined && data[i][10] !== "" ? Number(data[i][10]) : 0,
+      ratingDryness: data[i][11] !== undefined && data[i][11] !== "" ? Number(data[i][11]) : 0,
+      ratingTexture: data[i][12] !== undefined && data[i][12] !== "" ? Number(data[i][12]) : 0
     };
   }
   
@@ -191,13 +196,13 @@ function doPost(e) {
   // スプレッドシートが空、またはヘッダーしかない場合は初期化
   var lastRow = sheet.getLastRow();
   if (lastRow <= 1) {
-    sheet.getRange(1, 1, 1, 8).setValues([["ID", "お気に入り", "購入済み", "購入日", "感想メモ", "使用開始日", "使用終了日", "購入金額"]]);
+    sheet.getRange(1, 1, 1, 13).setValues([["ID", "お気に入り", "購入済み", "購入日", "感想メモ", "使用開始日", "使用終了日", "購入金額", "香り評価", "消臭効果評価", "泡立ち評価", "乾燥評価", "肌触り評価"]]);
     // 50行分を初期作成
     var initialValues = [];
     for (var id = 1; id <= 50; id++) {
-      initialValues.push([id, false, false, "", "", "", "", ""]);
+      initialValues.push([id, false, false, "", "", "", "", "", 0, 0, 0, 0, 0]);
     }
-    sheet.getRange(2, 1, 50, 8).setValues(initialValues);
+    sheet.getRange(2, 1, 50, 13).setValues(initialValues);
   }
   
   var postData = JSON.parse(e.postData.contents);
@@ -229,14 +234,19 @@ function doPost(e) {
     var startDate = pInfo ? pInfo.startDate : "";
     var endDate = pInfo ? pInfo.endDate : "";
     var price = pInfo && pInfo.price !== undefined && pInfo.price !== "" ? pInfo.price : "";
+    var rScent = pInfo && pInfo.ratingScent !== undefined ? pInfo.ratingScent : 0;
+    var rDeod = pInfo && pInfo.ratingDeodorant !== undefined ? pInfo.ratingDeodorant : 0;
+    var rFoam = pInfo && pInfo.ratingFoaming !== undefined ? pInfo.ratingFoaming : 0;
+    var rDry = pInfo && pInfo.ratingDryness !== undefined ? pInfo.ratingDryness : 0;
+    var rText = pInfo && pInfo.ratingTexture !== undefined ? pInfo.ratingTexture : 0;
     
-    // スプレッドシートの行を特定して更新 (F, G, H列を含むように範囲を拡大: B列からH列の計7列分)
+    // スプレッドシートの行を特定して更新 (B列からM列の計12列分に拡大)
     var row = idToRow[id];
     if (row) {
-      sheet.getRange(row, 2, 1, 7).setValues([[isFav, isBought, date, notes, startDate, endDate, price]]);
+      sheet.getRange(row, 2, 1, 12).setValues([[isFav, isBought, date, notes, startDate, endDate, price, rScent, rDeod, rFoam, rDry, rText]]);
     } else {
       // 行がなければ追加
-      sheet.appendRow([id, isFav, isBought, date, notes, startDate, endDate, price]);
+      sheet.appendRow([id, isFav, isBought, date, notes, startDate, endDate, price, rScent, rDeod, rFoam, rDry, rText]);
     }
   }
   
