@@ -1702,8 +1702,9 @@
         // カタログ価格をデフォルトの購入金額として設定
         const soapObj = soaps.find(s => s.id === id);
         const catalogPrice = soapObj ? soapObj.price : '';
+        const today = new Date().toISOString().split('T')[0];
         purchased[id] = { 
-          date: '', notes: '', startDate: '', endDate: '', price: catalogPrice,
+          date: today, notes: '', startDate: '', endDate: '', price: catalogPrice,
           ratingScent: 0, ratingDeodorant: 0, ratingFoaming: 0, ratingDryness: 0, ratingTexture: 0 
         };
       }
@@ -1718,8 +1719,9 @@
       if (!purchased[id]) {
         const soapObj = soaps.find(s => s.id === id);
         const catalogPrice = soapObj ? soapObj.price : '';
+        const today = new Date().toISOString().split('T')[0];
         purchased[id] = { 
-          date: '', notes: '', startDate: '', endDate: '', price: catalogPrice,
+          date: today, notes: '', startDate: '', endDate: '', price: catalogPrice,
           ratingScent: 0, ratingDeodorant: 0, ratingFoaming: 0, ratingDryness: 0, ratingTexture: 0 
         };
       }
@@ -2262,15 +2264,25 @@
       const newPurchased = {};
       const newCustomSoaps = cloudData.customSoaps || [];
       
+      const cleanDate = (d) => {
+        if (!d) return '';
+        const str = String(d).trim();
+        // 1899-12-30などの空白日付を検知して空欄にする
+        if (str.includes('1899') || str === '1899-12-30' || str === '1899/12/30') {
+          return '';
+        }
+        return str;
+      };
+      
       const pData = cloudData.purchased || {};
       Object.keys(pData).forEach(idStr => {
         const id = parseInt(idStr);
         const item = pData[idStr];
         newPurchased[id] = {
-          date: item.date || '',
+          date: cleanDate(item.date),
           notes: item.notes || '',
-          startDate: item.startDate || '',
-          endDate: item.endDate || '',
+          startDate: cleanDate(item.startDate),
+          endDate: cleanDate(item.endDate),
           price: item.price !== undefined && item.price !== '' ? parseFloat(item.price) : '',
           ratingScent: item.ratingScent !== undefined && item.ratingScent !== '' ? parseInt(item.ratingScent) : 0,
           ratingDeodorant: item.ratingDeodorant !== undefined && item.ratingDeodorant !== '' ? parseInt(item.ratingDeodorant) : 0,

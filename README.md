@@ -308,12 +308,19 @@ function doPost(e) {
 
 function formatDate(dateObj) {
   if (dateObj instanceof Date) {
+    if (dateObj.getFullYear() < 1900) {
+      return "";
+    }
     var year = dateObj.getFullYear();
     var month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
     var day = ("0" + dateObj.getDate()).slice(-2);
     return year + "-" + month + "-" + day;
   }
-  return String(dateObj);
+  var str = String(dateObj).trim();
+  if (str === "" || str === "null" || str === "undefined" || str.indexOf("1899") !== -1) {
+    return "";
+  }
+  return str;
 }
 ```
 
