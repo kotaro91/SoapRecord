@@ -705,6 +705,93 @@
       align-items: center;
       gap: 0.15rem;
     }
+
+    /* Floating Sync Button */
+    .floating-sync-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 1rem 1.5rem;
+      font-family: var(--font-base);
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 999;
+      transition: all 0.3s ease;
+      border: 1px solid var(--border-color);
+    }
+    
+    .floating-sync-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-3px);
+    }
+    
+    .floating-sync-btn.pending {
+      background: var(--gold-color);
+      animation: pulse-gold 1.5s infinite ease-in-out;
+    }
+    
+    @keyframes pulse-gold {
+      0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+    }
+    
+    /* Card Save Area */
+    .card-save-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px dashed var(--border-color);
+    }
+    
+    .unsaved-warning {
+      color: var(--gold-color);
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .card-save-btn {
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .card-save-btn:hover {
+      background: var(--accent-hover);
+    }
+    
+    .card-save-btn:disabled {
+      background: var(--text-muted) !important;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    .card-save-btn.saved {
+      background: rgba(76, 175, 80, 0.1);
+      color: var(--green-color);
+      border: 1px solid var(--green-color);
+      cursor: default;
+      opacity: 1 !important;
+    }
   </style>
 </head>
 <body>
@@ -751,6 +838,65 @@
             <li>承認画面が表示されたら許可し、最後に発行された「ウェブアプリのURL」をコピーして上の入力欄に貼り付け、「設定を保存して同期」を押します。</li>
           </ol>
         </div>
+      </div>
+    </details>
+
+    <!-- Add Custom Soap Section -->
+    <details class="sync-panel" id="add-soap-panel" style="margin-top: 1rem;">
+      <summary class="sync-header">
+        <h3>🆕 候補以外の石鹸を追加する</h3>
+      </summary>
+      <div class="sync-body">
+        <form id="add-soap-form" onsubmit="event.preventDefault(); addCustomSoap();">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label for="custom-name" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">製品名 <span style="color: #ffb703;">*</span></label>
+              <input type="text" id="custom-name" class="filter-control" placeholder="例: 牛乳石鹸 赤箱" required>
+            </div>
+            <div class="form-group">
+              <label for="custom-brand" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">ブランド名</label>
+              <input type="text" id="custom-brand" class="filter-control" placeholder="例: カウブランド">
+            </div>
+            <div class="form-group">
+              <label for="custom-price" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">価格 (税込)</label>
+              <input type="number" id="custom-price" class="filter-control" placeholder="例: 110" min="0">
+            </div>
+            <div class="form-group">
+              <label for="custom-process" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">製法</label>
+              <select id="custom-process" class="filter-control">
+                <option value="機械練り">機械練り</option>
+                <option value="コールドプロセス">コールドプロセス</option>
+                <option value="枠練り">枠練り</option>
+                <option value="半熟">半熟釜焚き</option>
+                <option value="その他">その他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="custom-scent-type" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">香りの系統</label>
+              <select id="custom-scent-type" class="filter-control">
+                <option value="フローラル">フローラル・甘め</option>
+                <option value="シトラス">シトラス・柑橘</option>
+                <option value="ウッディ">ウッディ・和風・アース</option>
+                <option value="ハーブ">ハーブ・ミント・クリア</option>
+                <option value="無香料">無香料</option>
+                <option value="その他">その他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="custom-skin-feel" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">使用感・肌触り</label>
+              <input type="text" id="custom-skin-feel" class="filter-control" placeholder="例: しっとり・すべすべ">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="custom-scent-desc" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">香りの詳細説明</label>
+            <input type="text" id="custom-scent-desc" class="filter-control" placeholder="例: ローズ調の優しい花の香り">
+          </div>
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="custom-features" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">製品の特徴</label>
+            <textarea id="custom-features" class="filter-control textarea" style="height: 60px; font-family: var(--font-base);" placeholder="例: スクワラン配合の豊かな泡立ちで、しっとりとした洗い上がりが特徴。"></textarea>
+          </div>
+          <button type="submit" class="sync-btn" style="width: 100%;">この石鹸をリストに追加する</button>
+        </form>
       </div>
     </details>
 
@@ -831,7 +977,7 @@
 
   <script>
     // Embedded JSON data
-    const soaps = [
+    const catalogSoaps = [
       {
         "id": 1,
         "name": "神戸酒石鹸",
@@ -1434,6 +1580,9 @@
       }
     ];
 
+    let customSoaps = JSON.parse(localStorage.getItem('soap_custom_soaps')) || [];
+    let soaps = [...catalogSoaps, ...customSoaps];
+
     // GAS Integration variables
     let gasUrl = localStorage.getItem('soap_gas_url') || '';
     let syncPassword = localStorage.getItem('soap_sync_password') || '';
@@ -1506,6 +1655,8 @@
       }
     }
 
+    let unsavedIds = new Set(JSON.parse(localStorage.getItem('soap_unsaved_ids')) || []);
+
     let activeTab = 'all';
 
     const grid = document.getElementById('soap-grid');
@@ -1539,8 +1690,8 @@
       }
       localStorage.setItem('soap_favorites', JSON.stringify(favorites));
       updateBadges();
+      markCardUnsaved(id);
       filterData();
-      triggerQueueSync();
     }
 
     // Toggle Purchased
@@ -1558,8 +1709,8 @@
       }
       localStorage.setItem('soap_purchased', JSON.stringify(purchased));
       updateBadges();
+      markCardUnsaved(id);
       filterData();
-      triggerQueueSync();
     }
 
     // Update Purchase Details (date, notes, startDate, endDate, price, ratings)
@@ -1587,11 +1738,13 @@
       // コスパ表示を再計算して書き換え
       updateCostDisplay(id);
       
+      // 評価やデータを変更した際に未保存マークを付与
+      markCardUnsaved(id);
+      
       // ソート順やフィルターに影響するキーの変更時は再レンダリング
       if (key === 'date' || key === 'startDate' || key === 'endDate' || key === 'price' || key.startsWith('rating')) {
         filterData();
       }
-      triggerQueueSync();
     }
 
     // Render Soaps
@@ -1609,6 +1762,7 @@
         const isFav = favorites.includes(soap.id);
         const isBought = !!purchased[soap.id];
         const buyDetails = purchased[soap.id] || { date: '', notes: '' };
+        const isUnsaved = unsavedIds.has(soap.id);
         
         // Generate Google Search Link dynamically
         const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(soap.brand + ' ' + soap.name)}`;
@@ -1649,26 +1803,26 @@
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
                 <div class="form-group">
                   <label>購入日</label>
-                  <input type="date" class="form-input" value="${buyDetails.date || ''}" onchange="updatePurchaseDetails(${soap.id}, 'date', this.value)">
+                  <input type="date" class="form-input" value="${buyDetails.date || ''}" oninput="markCardUnsaved(${soap.id})" onchange="updatePurchaseDetails(${soap.id}, 'date', this.value)">
                 </div>
                 <div class="form-group">
                   <label>購入金額 (税込)</label>
-                  <input type="number" class="form-input" min="0" placeholder="価格" value="${buyDetails.price !== undefined ? buyDetails.price : ''}" onchange="updatePurchaseDetails(${soap.id}, 'price', this.value)">
+                  <input type="number" class="form-input" min="0" placeholder="価格" value="${buyDetails.price !== undefined ? buyDetails.price : ''}" oninput="markCardUnsaved(${soap.id})" onchange="updatePurchaseDetails(${soap.id}, 'price', this.value)">
                 </div>
               </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
                 <div class="form-group">
                   <label>使用開始日</label>
-                  <input type="date" class="form-input" value="${buyDetails.startDate || ''}" onchange="updatePurchaseDetails(${soap.id}, 'startDate', this.value)">
+                  <input type="date" class="form-input" value="${buyDetails.startDate || ''}" oninput="markCardUnsaved(${soap.id})" onchange="updatePurchaseDetails(${soap.id}, 'startDate', this.value)">
                 </div>
                 <div class="form-group">
                   <label>使用終了日</label>
-                  <input type="date" class="form-input" value="${buyDetails.endDate || ''}" onchange="updatePurchaseDetails(${soap.id}, 'endDate', this.value)">
+                  <input type="date" class="form-input" value="${buyDetails.endDate || ''}" oninput="markCardUnsaved(${soap.id})" onchange="updatePurchaseDetails(${soap.id}, 'endDate', this.value)">
                 </div>
               </div>
               <div class="form-group">
                 <label>感想メモ</label>
-                <textarea class="form-input textarea" placeholder="使用感、香り立ちなど..." onchange="updatePurchaseDetails(${soap.id}, 'notes', this.value)">${buyDetails.notes || ''}</textarea>
+                <textarea class="form-input textarea" placeholder="使用感、香り立ちなど..." oninput="markCardUnsaved(${soap.id})" onchange="updatePurchaseDetails(${soap.id}, 'notes', this.value)">${buyDetails.notes || ''}</textarea>
               </div>
 
               <!-- 5つの評価軸 -->
@@ -1717,6 +1871,19 @@
 
               <!-- Daily Cost Display -->
               <div id="cost-display-${soap.id}" class="cost-display-text" style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--accent-hover); font-weight: 600; display: none; padding-top: 0.25rem; border-top: 1px dashed var(--border-color);">
+              </div>
+              
+              <!-- Card Save Area -->
+              <div class="card-save-area">
+                <span id="unsaved-warning-${soap.id}" class="unsaved-warning ${isUnsaved ? '' : 'hidden'}">
+                  ⚠️ 未保存の変更があります
+                </span>
+                <span id="saved-status-${soap.id}" class="unsaved-warning saved-status ${isUnsaved ? 'hidden' : ''}" style="color: var(--green-color);">
+                  🟢 保存済み
+                </span>
+                <button id="card-save-btn-${soap.id}" class="card-save-btn ${isUnsaved ? '' : 'saved'}" onclick="saveCardDetails(${soap.id})" ${isUnsaved ? '' : 'disabled'}>
+                  ${isUnsaved ? '保存して同期' : '保存完了'}
+                </button>
               </div>
             </div>
 
@@ -2004,12 +2171,12 @@
       updateSyncStatus('syncing');
       
       try {
-        if (syncPending) {
+        if (unsavedIds.size > 0) {
           // 未送信のローカルデータがある場合は、先にPOSTしてローカルデータをスプレッドシートに反映させる
           const success = await postDataToGas();
           if (success) {
-            syncPending = false;
-            localStorage.setItem('soap_sync_pending', 'false');
+            unsavedIds.clear();
+            localStorage.setItem('soap_unsaved_ids', JSON.stringify([]));
           } else {
             throw new Error('Pending post failed');
           }
@@ -2020,16 +2187,18 @@
         if (cloudData) {
           mergeCloudData(cloudData);
           updateSyncStatus('success');
+          updateFloatingSyncButton();
         } else {
           throw new Error('Fetch failed');
         }
       } catch (e) {
         console.error('Startup sync error:', e);
-        if (syncPending) {
+        if (unsavedIds.size > 0) {
           updateSyncStatus('pending');
         } else {
           updateSyncStatus('error');
         }
+        updateFloatingSyncButton();
       }
     }
 
@@ -2070,6 +2239,7 @@
           body: JSON.stringify({
             favorites: favorites,
             purchased: purchased,
+            soaps: soaps,
             password: syncPassword
           }),
           redirect: 'follow'
@@ -2087,42 +2257,101 @@
 
     // クラウドデータをローカルにマージ
     function mergeCloudData(cloudData) {
-      // cloudData of form: { "1": { favorite: true, purchased: true, date: "2026-05-20", notes: "...", startDate: "2026-05-21", endDate: "2026-05-25", price: 1200 }, ... }
-      const newFavorites = [];
+      // cloudData has { favorites: [], purchased: {}, customSoaps: [] }
+      const newFavorites = cloudData.favorites || [];
       const newPurchased = {};
+      const newCustomSoaps = cloudData.customSoaps || [];
       
-      Object.keys(cloudData).forEach(idStr => {
+      const pData = cloudData.purchased || {};
+      Object.keys(pData).forEach(idStr => {
         const id = parseInt(idStr);
-        const item = cloudData[idStr];
-        
-        if (item.favorite) {
-          newFavorites.push(id);
-        }
-        
-        if (item.purchased) {
-          newPurchased[id] = {
-            date: item.date || '',
-            notes: item.notes || '',
-            startDate: item.startDate || '',
-            endDate: item.endDate || '',
-            price: item.price !== undefined && item.price !== '' ? parseFloat(item.price) : '',
-            ratingScent: item.ratingScent !== undefined && item.ratingScent !== '' ? parseInt(item.ratingScent) : 0,
-            ratingDeodorant: item.ratingDeodorant !== undefined && item.ratingDeodorant !== '' ? parseInt(item.ratingDeodorant) : 0,
-            ratingFoaming: item.ratingFoaming !== undefined && item.ratingFoaming !== '' ? parseInt(item.ratingFoaming) : 0,
-            ratingDryness: item.ratingDryness !== undefined && item.ratingDryness !== '' ? parseInt(item.ratingDryness) : 0,
-            ratingTexture: item.ratingTexture !== undefined && item.ratingTexture !== '' ? parseInt(item.ratingTexture) : 0
-          };
-        }
+        const item = pData[idStr];
+        newPurchased[id] = {
+          date: item.date || '',
+          notes: item.notes || '',
+          startDate: item.startDate || '',
+          endDate: item.endDate || '',
+          price: item.price !== undefined && item.price !== '' ? parseFloat(item.price) : '',
+          ratingScent: item.ratingScent !== undefined && item.ratingScent !== '' ? parseInt(item.ratingScent) : 0,
+          ratingDeodorant: item.ratingDeodorant !== undefined && item.ratingDeodorant !== '' ? parseInt(item.ratingDeodorant) : 0,
+          ratingFoaming: item.ratingFoaming !== undefined && item.ratingFoaming !== '' ? parseInt(item.ratingFoaming) : 0,
+          ratingDryness: item.ratingDryness !== undefined && item.ratingDryness !== '' ? parseInt(item.ratingDryness) : 0,
+          ratingTexture: item.ratingTexture !== undefined && item.ratingTexture !== '' ? parseInt(item.ratingTexture) : 0
+        };
       });
 
       favorites = newFavorites;
       purchased = newPurchased;
+      customSoaps = newCustomSoaps;
 
       localStorage.setItem('soap_favorites', JSON.stringify(favorites));
       localStorage.setItem('soap_purchased', JSON.stringify(purchased));
+      localStorage.setItem('soap_custom_soaps', JSON.stringify(customSoaps));
+      
+      // 全体リストを再構築
+      soaps = [...catalogSoaps, ...customSoaps];
       
       updateBadges();
       filterData();
+    }
+
+    // 新規石鹸の追加処理
+    window.addCustomSoap = function() {
+      const name = document.getElementById('custom-name').value.trim();
+      const brand = document.getElementById('custom-brand').value.trim() || '（不明）';
+      const priceVal = document.getElementById('custom-price').value;
+      const price = priceVal !== '' ? parseInt(priceVal) : 0;
+      const process = document.getElementById('custom-process').value;
+      const scent_type = document.getElementById('custom-scent-type').value;
+      const scent_desc = document.getElementById('custom-scent-desc').value.trim() || '（説明なし）';
+      const features = document.getElementById('custom-features').value.trim() || 'ユーザーが追加した石鹸です。';
+      const skin_feel = document.getElementById('custom-skin-feel').value.trim() || '未評価';
+      
+      if (!name) {
+        alert('製品名は必須項目です。');
+        return;
+      }
+      
+      // IDの採番（既存IDの最大値 + 1。最低51）
+      let maxId = 50;
+      soaps.forEach(s => {
+        if (s.id > maxId) maxId = s.id;
+      });
+      const newId = maxId + 1;
+      
+      const newSoap = {
+        id: newId,
+        name: name,
+        brand: brand,
+        price: price,
+        process: process,
+        scent_type: scent_type,
+        scent_desc: scent_desc,
+        features: features,
+        reviews: 'ユーザーによる登録',
+        skin_feel: skin_feel
+      };
+      
+      // リストへの追加
+      customSoaps.push(newSoap);
+      localStorage.setItem('soap_custom_soaps', JSON.stringify(customSoaps));
+      
+      // soaps全体の再構築
+      soaps = [...catalogSoaps, ...customSoaps];
+      
+      // 新しく追加した石鹸を未保存フラグ対象にする
+      markCardUnsaved(newId);
+      
+      // 画面更新
+      updateBadges();
+      filterData();
+      
+      // フォームのクリアとアコーディオンのクローズ
+      document.getElementById('add-soap-form').reset();
+      const panel = document.getElementById('add-soap-panel');
+      if (panel) panel.removeAttribute('open');
+      
+      alert(`「${name}」をリストに追加しました！\n右下の「同期する」ボタンを押すとスプレッドシートへ同期されます。`);
     }
 
     // GAS設定（URL & パスワード）の保存
@@ -2178,21 +2407,111 @@
       }
     }
 
+    // --- 新規追加: 未保存状態の管理 ---
+    window.markCardUnsaved = function(id) {
+      if (!unsavedIds.has(id)) {
+        unsavedIds.add(id);
+        localStorage.setItem('soap_unsaved_ids', JSON.stringify(Array.from(unsavedIds)));
+        
+        // カード内の未保存警告を表示
+        const warning = document.getElementById(`unsaved-warning-${id}`);
+        const status = document.getElementById(`saved-status-${id}`);
+        const saveBtn = document.getElementById(`card-save-btn-${id}`);
+        if (warning) warning.classList.remove('hidden');
+        if (status) status.classList.add('hidden');
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = '保存して同期';
+          saveBtn.classList.remove('saved');
+        }
+        
+        updateFloatingSyncButton();
+      }
+    }
+
+    // フローティング同期ボタンの更新
+    function updateFloatingSyncButton() {
+      const btn = document.getElementById('floating-sync-btn');
+      const countSpan = document.getElementById('unsaved-count');
+      if (!btn || !countSpan) return;
+      
+      const count = unsavedIds.size;
+      if (count > 0) {
+        btn.classList.remove('hidden');
+        btn.classList.add('pending');
+        countSpan.textContent = count;
+      } else {
+        btn.classList.add('hidden');
+        btn.classList.remove('pending');
+        countSpan.textContent = '0';
+      }
+    }
+
+    // 各カードの保存処理
+    window.saveCardDetails = async function(id) {
+      const saveBtn = document.getElementById(`card-save-btn-${id}`);
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = '保存中...';
+      }
+      
+      updateSyncStatus('syncing');
+      
+      try {
+        const success = await postDataToGas();
+        if (success) {
+          unsavedIds.delete(id);
+          localStorage.setItem('soap_unsaved_ids', JSON.stringify(Array.from(unsavedIds)));
+          
+          updateSyncStatus('success');
+          updateFloatingSyncButton();
+          
+          // UI表示を保存済みに
+          const warning = document.getElementById(`unsaved-warning-${id}`);
+          const status = document.getElementById(`saved-status-${id}`);
+          if (warning) warning.classList.add('hidden');
+          if (status) status.classList.remove('hidden');
+          if (saveBtn) {
+            saveBtn.textContent = '保存完了';
+            saveBtn.classList.add('saved');
+          }
+          
+          // 全体再レンダリング（ソート順などに反映するため）
+          filterData();
+        } else {
+          throw new Error('Sync failed');
+        }
+      } catch (e) {
+        console.error('Save card details error:', e);
+        updateSyncStatus('error');
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = '保存して同期';
+        }
+        alert('同期に失敗しました。インターネット接続または同期設定を確認してください。\nデータはブラウザ（ローカル）に一時保存されています。');
+      }
+    }
+
     // 手動同期トリガー
     window.triggerManualSync = async function() {
-      if (!gasUrl) return;
+      if (!gasUrl) {
+        alert('同期設定がされていません。「スプレッドシート同期設定」から設定を行ってください。');
+        return;
+      }
       updateSyncStatus('syncing');
       
       try {
         const postSuccess = await postDataToGas();
         if (postSuccess) {
-          syncPending = false;
-          localStorage.setItem('soap_sync_pending', 'false');
+          unsavedIds.clear();
+          localStorage.setItem('soap_unsaved_ids', JSON.stringify([]));
           
           const cloudData = await getDataFromGas();
           if (cloudData) {
             mergeCloudData(cloudData);
             updateSyncStatus('success');
+            updateFloatingSyncButton();
+            alert('すべてのデータをスプレッドシートと同期しました！');
           } else {
             throw new Error('Fetch failed');
           }
@@ -2204,29 +2523,6 @@
         updateSyncStatus('error');
         alert('同期に失敗しました。ネットワーク接続またはURL設定を確認してください。');
       }
-    }
-
-    // データ更新時の非同期同期処理
-    let debounceTimeout = null;
-    function triggerQueueSync() {
-      if (!gasUrl) return;
-      
-      updateSyncStatus('syncing');
-      syncPending = true;
-      localStorage.setItem('soap_sync_pending', 'true');
-      
-      if (debounceTimeout) clearTimeout(debounceTimeout);
-      
-      debounceTimeout = setTimeout(async () => {
-        const success = await postDataToGas();
-        if (success) {
-          syncPending = false;
-          localStorage.setItem('soap_sync_pending', 'false');
-          updateSyncStatus('success');
-        } else {
-          updateSyncStatus('pending');
-        }
-      }, 1500);
     }
 
     // Initial Load & Listeners
@@ -2276,11 +2572,19 @@
           }
         });
       }
+      
+      // 初期ロード時にフローティングボタンの状態を更新
+      updateFloatingSyncButton();
     });
 
     // Initial Load
     updateBadges();
     render(soaps);
+    updateFloatingSyncButton();
   </script>
+  <!-- Floating Sync Button -->
+  <button id="floating-sync-btn" class="floating-sync-btn hidden" onclick="triggerManualSync()">
+    <span>💾</span> スプレッドシートへ同期する (<span id="unsaved-count">0</span>)
+  </button>
 </body>
 </html>

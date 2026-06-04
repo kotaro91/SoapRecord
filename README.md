@@ -151,7 +151,7 @@
 
 #### 【GASコピペ用ソースコード】
 ```javascript
-// 【必須設定】ご夫婦で共有する秘密のパスワードを設定してください（例: "mySecretSoapKey123"）
+// 【必須設定】ご夫婦で共有する秘密のパスワードを設定してください
 var SECURITY_PASSWORD = "ここにパスワードを入力";
 
 function doGet(e) {
@@ -163,31 +163,62 @@ function doGet(e) {
 
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = sheet.getDataRange().getValues();
-  var result = {};
   
-  // 1行目はヘッダー [ID, お気に入り, 購入済み, 購入日, 感想メモ, 使用開始日, 使用終了日, 購入金額, 香り評価, 消臭効果評価, 泡立ち評価, 乾燥評価, 肌触り評価]
+  var favorites = [];
+  var purchased = {};
+  var customSoaps = [];
+  
+  // 1行目はヘッダー
   // 2行目以降がデータ
   for (var i = 1; i < data.length; i++) {
-    var id = data[i][0];
+    var row = data[i];
+    var id = parseInt(row[0]);
     if (!id) continue;
-    result[id] = {
-      favorite: data[i][1] === true || data[i][1] === "TRUE" || data[i][1] === 1,
-      purchased: data[i][2] === true || data[i][2] === "TRUE" || data[i][2] === 1,
-      date: data[i][3] ? formatDate(data[i][3]) : "",
-      notes: data[i][4] || "",
-      startDate: data[i][5] ? formatDate(data[i][5]) : "",
-      endDate: data[i][6] ? formatDate(data[i][6]) : "",
-      price: data[i][7] !== undefined && data[i][7] !== "" ? Number(data[i][7]) : "",
-      ratingScent: data[i][8] !== undefined && data[i][8] !== "" ? Number(data[i][8]) : 0,
-      ratingDeodorant: data[i][9] !== undefined && data[i][9] !== "" ? Number(data[i][9]) : 0,
-      ratingFoaming: data[i][10] !== undefined && data[i][10] !== "" ? Number(data[i][10]) : 0,
-      ratingDryness: data[i][11] !== undefined && data[i][11] !== "" ? Number(data[i][11]) : 0,
-      ratingTexture: data[i][12] !== undefined && data[i][12] !== "" ? Number(data[i][12]) : 0
-    };
+    
+    var isFav = row[10] === true || row[10] === "TRUE" || row[10] === 1;
+    var isBought = row[11] === true || row[11] === "TRUE" || row[11] === 1;
+    
+    if (isFav) {
+      favorites.push(id);
+    }
+    
+    if (isBought) {
+      purchased[id] = {
+        date: row[12] ? formatDate(row[12]) : "",
+        notes: row[13] || "",
+        startDate: row[14] ? formatDate(row[14]) : "",
+        endDate: row[15] ? formatDate(row[15]) : "",
+        price: row[16] !== undefined && row[16] !== "" ? Number(row[16]) : "",
+        ratingScent: row[17] !== undefined && row[17] !== "" ? Number(row[17]) : 0,
+        ratingDeodorant: row[18] !== undefined && row[18] !== "" ? Number(row[18]) : 0,
+        ratingFoaming: row[19] !== undefined && row[19] !== "" ? Number(row[19]) : 0,
+        ratingDryness: row[20] !== undefined && row[20] !== "" ? Number(row[20]) : 0,
+        ratingTexture: row[21] !== undefined && row[21] !== "" ? Number(row[21]) : 0
+      };
+    }
+    
+    // カスタム石鹸 (ID 51以降) の製品情報を取得
+    if (id > 50) {
+      customSoaps.push({
+        id: id,
+        name: row[1] || "",
+        brand: row[2] || "",
+        price: row[3] !== undefined && row[3] !== "" ? Number(row[3]) : 0,
+        process: row[4] || "",
+        scent_type: row[5] || "",
+        scent_desc: row[6] || "",
+        features: row[7] || "",
+        reviews: row[8] || "",
+        skin_feel: row[9] || ""
+      });
+    }
   }
   
-  return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify({
+    favorites: favorites,
+    purchased: purchased,
+    customSoaps: customSoaps
+  })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
@@ -196,13 +227,7 @@ function doPost(e) {
   // スプレッドシートが空、またはヘッダーしかない場合は初期化
   var lastRow = sheet.getLastRow();
   if (lastRow <= 1) {
-    sheet.getRange(1, 1, 1, 13).setValues([["ID", "お気に入り", "購入済み", "購入日", "感想メモ", "使用開始日", "使用終了日", "購入金額", "香り評価", "消臭効果評価", "泡立ち評価", "乾燥評価", "肌触り評価"]]);
-    // 50行分を初期作成
-    var initialValues = [];
-    for (var id = 1; id <= 50; id++) {
-      initialValues.push([id, false, false, "", "", "", "", "", 0, 0, 0, 0, 0]);
-    }
-    sheet.getRange(2, 1, 50, 13).setValues(initialValues);
+    sheet.getRange(1, 1, 1, 22).setValues([["ID", "製品名", "ブランド", "価格", "製法", "香り系統", "香り詳細", "特徴", "クチコミ", "使用感", "お気に入り", "購入済み", "購入日", "感想メモ", "使用開始日", "使用終了日", "購入金額", "香り評価", "消臭効果評価", "泡立ち評価", "乾燥評価", "肌触り評価"]]);
   }
   
   var postData = JSON.parse(e.postData.contents);
@@ -220,12 +245,16 @@ function doPost(e) {
     idToRow[values[i][0]] = i + 1; // 1-based index for row
   }
   
-  // 送られてきたデータを書き込む
   var favorites = postData.favorites || [];
   var purchased = postData.purchased || {};
+  var soaps = postData.soaps || [];
   
-  // 1〜50のIDについて更新用の配列を作成
-  for (var id = 1; id <= 50; id++) {
+  // 送られてきた石鹸リストをIDに基づいて書き込む
+  for (var i = 0; i < soaps.length; i++) {
+    var soap = soaps[i];
+    var id = parseInt(soap.id);
+    if (!id) continue;
+    
     var isFav = favorites.indexOf(id) !== -1 || favorites.indexOf(String(id)) !== -1;
     var pInfo = purchased[id] || purchased[String(id)];
     var isBought = !!pInfo;
@@ -240,13 +269,36 @@ function doPost(e) {
     var rDry = pInfo && pInfo.ratingDryness !== undefined ? pInfo.ratingDryness : 0;
     var rText = pInfo && pInfo.ratingTexture !== undefined ? pInfo.ratingTexture : 0;
     
-    // スプレッドシートの行を特定して更新 (B列からM列の計12列分に拡大)
+    var rowValues = [
+      id,
+      soap.name || "",
+      soap.brand || "",
+      soap.price !== undefined && soap.price !== "" ? Number(soap.price) : "",
+      soap.process || "",
+      soap.scent_type || "",
+      soap.scent_desc || "",
+      soap.features || "",
+      soap.reviews || "",
+      soap.skin_feel || "",
+      isFav,
+      isBought,
+      date,
+      notes,
+      startDate,
+      endDate,
+      price,
+      rScent,
+      rDeod,
+      rFoam,
+      rDry,
+      rText
+    ];
+    
     var row = idToRow[id];
     if (row) {
-      sheet.getRange(row, 2, 1, 12).setValues([[isFav, isBought, date, notes, startDate, endDate, price, rScent, rDeod, rFoam, rDry, rText]]);
+      sheet.getRange(row, 1, 1, 22).setValues([rowValues]);
     } else {
-      // 行がなければ追加
-      sheet.appendRow([id, isFav, isBought, date, notes, startDate, endDate, price, rScent, rDeod, rFoam, rDry, rText]);
+      sheet.appendRow(rowValues);
     }
   }
   
